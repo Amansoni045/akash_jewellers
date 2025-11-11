@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { verifyPassword, generateToken } from "@/lib/auth";
+import { comparePassword, generateToken } from "@/lib/auth"; 
 
 export async function POST(req) {
   try {
@@ -15,24 +15,22 @@ export async function POST(req) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const valid = verifyPassword(password, user.password);
-
+    const valid = comparePassword(password, user.password);
     if (!valid){
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
-    const token = generateToken(user); 
+    const token = generateToken(user);
 
     return NextResponse.json({
       message: "Login successful",
       token,
-      user: { 
-        id: user.id, 
+      user: { id: user.id, 
         name: user.name, 
         email: user.email 
       }
     });
-
+    
   } catch (err) {
     console.error(err);
     return NextResponse.json({ error: "Server error" }, { status: 500 });

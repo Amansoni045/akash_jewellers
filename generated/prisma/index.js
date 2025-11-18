@@ -127,7 +127,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/Users/amansoni/Documents/Documents - Aman’s MacBook Pro (3)/Projects/Akash Jewellers/generated/prisma",
+      "value": "/Users/tanishkagrawalprsnl/Desktop/aman/generated/prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -141,12 +141,11 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/Users/amansoni/Documents/Documents - Aman’s MacBook Pro (3)/Projects/Akash Jewellers/prisma/schema.prisma",
+    "sourceFilePath": "/Users/tanishkagrawalprsnl/Desktop/aman/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": null,
-    "schemaEnvPath": "../../.env"
+    "rootEnvPath": null
   },
   "relativePath": "../../prisma",
   "clientVersion": "6.16.2",
@@ -155,6 +154,7 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
+  "postinstall": true,
   "inlineDatasources": {
     "db": {
       "url": {
@@ -165,7 +165,7 @@ const config = {
   },
   "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id        Int      @id @default(autoincrement())\n  name      String\n  email     String   @unique\n  password  String\n  role      String   @default(\"customer\")\n  createdAt DateTime @default(now())\n}\n",
   "inlineSchemaHash": "11ed2972254f32a23f75eda5b527a71926e38b9ea1bd2a984dd88eab3d411cf5",
-  "copyEngine": false
+  "copyEngine": true
 }
 
 const fs = require('fs')
@@ -202,3 +202,9 @@ const PrismaClient = getPrismaClient(config)
 exports.PrismaClient = PrismaClient
 Object.assign(exports, Prisma)
 
+// file annotations for bundling tools to include these files
+path.join(__dirname, "libquery_engine-darwin-arm64.dylib.node");
+path.join(process.cwd(), "generated/prisma/libquery_engine-darwin-arm64.dylib.node")
+// file annotations for bundling tools to include these files
+path.join(__dirname, "schema.prisma");
+path.join(process.cwd(), "generated/prisma/schema.prisma")

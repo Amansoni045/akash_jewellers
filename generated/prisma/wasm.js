@@ -126,7 +126,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/Users/tanishkagrawalprsnl/Desktop/aman/generated/prisma",
+      "value": "/Users/amansoni/Documents/Documents - Aman’s MacBook Pro (3)/Projects/Akash Jewellers/generated/prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -140,11 +140,12 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/Users/tanishkagrawalprsnl/Desktop/aman/prisma/schema.prisma",
+    "sourceFilePath": "/Users/amansoni/Documents/Documents - Aman’s MacBook Pro (3)/Projects/Akash Jewellers/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": null
+    "rootEnvPath": null,
+    "schemaEnvPath": "../../.env"
   },
   "relativePath": "../../prisma",
   "clientVersion": "6.16.2",

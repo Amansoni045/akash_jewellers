@@ -18,6 +18,10 @@ export async function GET(req) {
     const token = authHeader.split(" ")[1];
     const decoded = verifyToken(token);
 
+    if (!decoded) {
+      return NextResponse.json({ error: "Invalid token" }, { status: 403, headers: corsHeaders() });
+    }
+
     const user = await prisma.user.findUnique({
       where: { id: decoded.id },
       select: { id: true, name: true, email: true }

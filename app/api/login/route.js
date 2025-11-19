@@ -23,7 +23,7 @@ export async function POST(req) {
       return NextResponse.json({ error: "User not found" }, { status: 404, headers: corsHeaders() });
     }
 
-    const valid = comparePassword(password, user.password);
+    const valid = await comparePassword(password, user.password);
     if (!valid) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401, headers: corsHeaders() });
     }
@@ -33,11 +33,18 @@ export async function POST(req) {
     return NextResponse.json({
       message: "Login successful",
       token,
-      user: { id: user.id, name: user.name, email: user.email },
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email
+      }
     }, { headers: corsHeaders() });
 
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ error: "Server error" }, { status: 500, headers: corsHeaders() });
+    return NextResponse.json(
+      { error: "Server error" },
+      { status: 500, headers: corsHeaders() }
+    );
   }
 }

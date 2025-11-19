@@ -10,17 +10,14 @@ export default function Navbar() {
     const token = localStorage.getItem("token");
     if (!token) return;
 
-    const fetchUser = async () => {
+    (async () => {
       try {
-        const res = await api.get("/me", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await api.get("/me", { headers: { Authorization: `Bearer ${token}` }});
         setUser(res.data.user);
       } catch {
         setUser(null);
       }
-    };
-    fetchUser();
+    })();
   }, []);
 
   const handleLogout = () => {
@@ -30,31 +27,20 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-gray-900 text-white px-6 py-4 flex justify-between items-center shadow-md">
-      <Link
-        href="/"
-        className="text-2xl font-bold text-yellow-400 tracking-wide"
-      >
-        Akash Jewellers
-      </Link>
+    <nav className="bg-gray-900 text-white px-6 py-4 flex justify-between items-center">
+      <Link href="/" className="text-2xl font-bold text-yellow-400">Akash Jewellers</Link>
 
-      <div className="flex space-x-6 items-center">
+      <div className="flex items-center space-x-4">
         {!user ? (
           <>
-            <Link href="/register" className="hover:text-yellow-400 transition">
-              Register
-            </Link>
-            <Link href="/login" className="hover:text-yellow-400 transition">
-              Login
-            </Link>
+            <Link href="/register" className="hover:text-yellow-300">Register</Link>
+            <Link href="/login" className="hover:text-yellow-300">Login</Link>
           </>
         ) : (
-          <button
-            onClick={handleLogout}
-            className="bg-yellow-500 px-4 py-2 rounded-md font-semibold hover:bg-yellow-600 transition"
-          >
-            Logout
-          </button>
+          <>
+            <span>{user.name}</span>
+            <button onClick={handleLogout} className="bg-yellow-500 px-3 py-1 rounded">Logout</button>
+          </>
         )}
       </div>
     </nav>

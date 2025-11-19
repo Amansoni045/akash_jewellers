@@ -1,7 +1,8 @@
 export default function Home() {
   return (
-    <div className="flex flex-col items-center justify-center text-center mt-20">
-      <h1 className="text-4xl font-bold text-gray-800 mb-4">Welcome to Akash Jewellers 💎</h1>
+    <div className="mt-8">
+      <h1 className="text-3xl font-bold">Welcome to Akash Jewellers</h1>
+      <p className="mt-4">Simple demo app. Use register → login.</p>
     </div>
   );
 }

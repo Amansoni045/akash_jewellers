@@ -3,8 +3,11 @@ import prisma from "@/lib/prisma";
 import { hashPassword } from "@/lib/auth";
 import { corsHeaders } from "@/lib/cors";
 
-export async function OPTIONS() {
-  return NextResponse.json({}, { headers: corsHeaders() });
+export async function OPTIONS(req) {
+  return new NextResponse(null, {
+    status: 200,
+    headers: corsHeaders(req),
+  });
 }
 
 export async function POST(req) {
@@ -14,7 +17,7 @@ export async function POST(req) {
     if (!name || !email || !password) {
       return NextResponse.json(
         { error: "All fields required" },
-        { status: 400, headers: corsHeaders() }
+        { status: 400, headers: corsHeaders(req) }
       );
     }
 
@@ -25,18 +28,17 @@ export async function POST(req) {
     if (existingUser) {
       return NextResponse.json(
         { error: "User already exists" },
-        { status: 400, headers: corsHeaders() }
+        { status: 400, headers: corsHeaders(req) }
       );
     }
 
     if (password.length < 8) {
       return NextResponse.json(
         { error: "Password must be at least 8 characters" },
-        { status: 400, headers: corsHeaders() }
+        { status: 400, headers: corsHeaders(req) }
       );
     }
 
-    // FIXED: Added await
     const hashedPassword = await hashPassword(password);
 
     const newUser = await prisma.user.create({
@@ -52,14 +54,14 @@ export async function POST(req) {
         message: "User registered successfully",
         user: { id: newUser.id, name: newUser.name, email: newUser.email },
       },
-      { headers: corsHeaders() }
+      { status: 200, headers: corsHeaders(req) }
     );
 
   } catch (err) {
     console.error(err);
     return NextResponse.json(
       { error: "Server error" },
-      { status: 500, headers: corsHeaders() }
+      { status: 500, headers: corsHeaders(req) }
     );
   }
 }

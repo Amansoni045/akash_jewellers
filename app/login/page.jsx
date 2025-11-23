@@ -13,7 +13,7 @@ export default function LoginPage() {
       const res = await api.post("/login", form);
       if (res.data?.token) {
         localStorage.setItem("token", res.data.token);
-        // redirect to home or dashboard
+
         window.location.href = "/";
       }
     } catch (err) {

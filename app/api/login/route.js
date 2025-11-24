@@ -58,7 +58,7 @@ export async function POST(req) {
   } catch (err) {
     console.error(err);
     return NextResponse.json(
-      { error: "Server error" },
+      { error: `Server error: ${err.message}` },
       { status: 500, headers: corsHeaders(req) }
     );
   }

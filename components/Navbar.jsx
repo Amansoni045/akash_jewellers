@@ -7,7 +7,10 @@ import { Menu, X, User } from "lucide-react";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userName, setUserName] = useState("");
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
@@ -15,26 +18,49 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const scrollToSection = (id) => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-      setIsMenuOpen(false);
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    setIsLoggedIn(true);
+
+    fetch("/api/me", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => setUserName(data?.user?.name || "Profile"))
+      .catch(() => setIsLoggedIn(false));
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (!e.target.closest(".profile-menu")) {
+        setProfileMenuOpen(false);
+      }
     }
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    setIsLoggedIn(false);
+    setProfileMenuOpen(false);
+    window.location.href = "/login";
   };
 
   return (
     <header
       className={`fixed top-0 w-full z-40 transition-all duration-300 ${
         isScrolled
-          ? "bg-white/70 backdrop-blur-md shadow-sm dark:bg-black/50"
+          ? "bg-white/70 backdrop-blur-md shadow-sm"
           : "bg-transparent"
       }`}
     >
       <div className="container mx-auto px-4 py-4">
 
         <div className="flex items-center justify-between">
-          
+
           <Link href="/">
             <Image
               src="/logo.png"
@@ -48,92 +74,97 @@ export default function Navbar() {
 
           <nav className="hidden md:flex items-center space-x-8">
 
-            <button
-              onClick={() => scrollToSection("home")}
-              className="hover:text-primary font-medium"
-            >
+            <button onClick={() => scrollTo("home")} className="hover:text-primary font-medium">
               Home
             </button>
 
-            <button
-              onClick={() => scrollToSection("about")}
-              className="hover:text-primary font-medium"
-            >
+            <button onClick={() => scrollTo("about")} className="hover:text-primary font-medium">
               About Us
             </button>
 
-            <button
-              onClick={() => scrollToSection("collection")}
-              className="hover:text-primary font-medium"
-            >
+            <button onClick={() => scrollTo("collection")} className="hover:text-primary font-medium">
               Catalogue
             </button>
 
-            <button
-              onClick={() => scrollToSection("contact")}
-              className="hover:text-primary font-medium"
-            >
+            <button onClick={() => scrollTo("contact")} className="hover:text-primary font-medium">
               Contact
             </button>
 
-            <Link
-              href="/login"
-              className="ml-4 px-4 py-2 bg-primary text-white font-medium rounded-md flex items-center gap-2 hover:opacity-90"
-            >
-              <User className="h-4 w-4" />
-              Login
-            </Link>
+            {!isLoggedIn ? (
+              <Link
+                href="/login"
+                className="ml-4 px-4 py-2 bg-primary text-white rounded-md flex items-center gap-2 hover:opacity-90"
+              >
+                <User className="h-4 w-4" />
+                Login
+              </Link>
+            ) : (
+              <div className="relative ml-4 profile-menu">
+                <button
+                  onClick={() => setProfileMenuOpen((prev) => !prev)}
+                  className="flex items-center gap-2 bg-yellow-500 px-4 py-2 rounded-md text-black hover:bg-yellow-600"
+                >
+                  <User className="h-5 w-5" />
+                  {userName?.split(" ")[0]}
+                </button>
+
+                {/* Dropdown */}
+                {profileMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-36 bg-white shadow-md rounded-md p-2 animate-fadeIn z-50">
+                    <button
+                      onClick={logout}
+                      className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
 
           </nav>
 
           <button
             className="md:hidden p-2"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
 
-        {isMenuOpen && (
+        {isMobileMenuOpen && (
           <div className="md:hidden mt-4 pb-4 border-t border-border">
             <nav className="flex flex-col mt-4 space-y-4">
-
-              <button
-                onClick={() => scrollToSection("home")}
-                className="text-left font-medium"
-              >
+              <button onClick={() => scrollTo("home")} className="text-left font-medium">
                 Home
               </button>
-
-              <button
-                onClick={() => scrollToSection("about")}
-                className="text-left font-medium"
-              >
+              <button onClick={() => scrollTo("about")} className="text-left font-medium">
                 About Us
               </button>
-
-              <button
-                onClick={() => scrollToSection("collection")}
-                className="text-left font-medium"
-              >
+              <button onClick={() => scrollTo("collection")} className="text-left font-medium">
                 Catalogue
               </button>
-
-              <button
-                onClick={() => scrollToSection("contact")}
-                className="text-left font-medium"
-              >
+              <button onClick={() => scrollTo("contact")} className="text-left font-medium">
                 Contact
               </button>
 
-              <Link
-                href="/login"
-                className="px-4 py-2 bg-primary text-white rounded-md flex items-center gap-2 justify-center"
-              >
-                <User className="h-4 w-4" />
-                Login
-              </Link>
-
+              {!isLoggedIn ? (
+                <Link
+                  href="/login"
+                  className="px-4 py-2 bg-primary text-white rounded-md flex items-center gap-2 justify-center"
+                >
+                  <User className="h-4 w-4" />
+                  Login
+                </Link>
+              ) : (
+                <button
+                  onClick={logout}
+                  className="px-4 py-2 bg-yellow-500 text-black rounded-md flex items-center gap-2 justify-center"
+                >
+                  <User className="h-4 w-4" />
+                  Logout
+                </button>
+              )}
             </nav>
           </div>
         )}
@@ -141,4 +172,9 @@ export default function Navbar() {
       </div>
     </header>
   );
+}
+
+function scrollTo(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: "smooth" });
 }

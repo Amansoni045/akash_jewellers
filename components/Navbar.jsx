@@ -74,26 +74,26 @@ export default function Navbar() {
 
           <nav className="hidden md:flex items-center space-x-8">
 
-            <button onClick={() => scrollTo("home")} className="hover:text-primary font-medium">
+            <button onClick={() => scrollTo("home")} className="text-black hover:text-yellow-600 font-medium">
               Home
             </button>
 
-            <button onClick={() => scrollTo("about")} className="hover:text-primary font-medium">
+            <button onClick={() => scrollTo("about")} className="text-black hover:text-yellow-600 font-medium">
               About Us
             </button>
 
-            <button onClick={() => scrollTo("collection")} className="hover:text-primary font-medium">
+            <button onClick={() => scrollTo("collection")} className="text-black hover:text-yellow-600 font-medium">
               Catalogue
             </button>
 
-            <button onClick={() => scrollTo("contact")} className="hover:text-primary font-medium">
+            <button onClick={() => scrollTo("contact")} className="text-black hover:text-yellow-600 font-medium">
               Contact
             </button>
 
             {!isLoggedIn ? (
               <Link
                 href="/login"
-                className="ml-4 px-4 py-2 bg-primary text-white rounded-md flex items-center gap-2 hover:opacity-90"
+                className="ml-4 px-4 py-2 bg-primary text-black rounded-md flex items-center gap-2 hover:opacity-90"
               >
                 <User className="h-4 w-4" />
                 Login
@@ -113,7 +113,7 @@ export default function Navbar() {
                   <div className="absolute right-0 mt-2 w-36 bg-white shadow-md rounded-md p-2 animate-fadeIn z-50">
                     <button
                       onClick={logout}
-                      className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded"
+                      className="w-full text-left text-black px-3 py-2 hover:bg-gray-100 rounded"
                     >
                       Logout
                     </button>

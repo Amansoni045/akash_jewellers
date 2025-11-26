@@ -36,7 +36,7 @@ export async function GET(req) {
   } catch (err) {
     console.error(err);
     return NextResponse.json(
-      { error: "Invalid token" },
+       { error: "Invalid token" },
       { status: 403 }
     );
   }

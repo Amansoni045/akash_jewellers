@@ -4,25 +4,25 @@ import { verifyToken } from "@/lib/auth";
 
 export async function GET(req) {
   try {
-    const { search, sort, page, limit, category } = Object.fromEntries(
-      new URL(req.url).searchParams
-    );
+    const { searchParams } = new URL(req.url);
 
-    const pageNum = Number(page) || 1;
-    const limitNum = Number(limit) || 10;
-    const skip = (pageNum - 1) * limitNum;
+    const page = Number(searchParams.get("page")) || 1;
+    const limit = Number(searchParams.get("limit")) || 10;
+    const search = searchParams.get("search") || "";
+    const sort = searchParams.get("sort") || "createdAt_desc";
+    const category = searchParams.get("category") || "";
 
-    let orderBy = {};
-    if (sort) {
-      const [field, direction] = sort.split("_");
-      orderBy[field] = direction;
-    } else {
-      orderBy = { createdAt: "desc" };
-    }
+    const orderFields = {
+      createdAt_desc: { createdAt: "desc" },
+      createdAt_asc: { createdAt: "asc" },
+      price_asc: { price: "asc" },
+      price_desc: { price: "desc" },
+      name_asc: { name: "asc" },
+      name_desc: { name: "desc" }
+    };
 
     const where = {
       AND: [
-        category ? { category: { equals: category, mode: "insensitive" } } : {},
         search
           ? {
               OR: [
@@ -31,71 +31,63 @@ export async function GET(req) {
               ],
             }
           : {},
+
+        category ? { category: category.toLowerCase() } : {},
       ],
     };
 
     const data = await prisma.jewellery.findMany({
       where,
-      orderBy,
-      skip,
-      take: limitNum,
+      orderBy: orderFields[sort],
+      skip: (page - 1) * limit,
+      take: limit,
     });
 
-    const total = await prisma.jewellery.count({ where });
-
-    return NextResponse.json({
-      success: true,
-      data,
-      pagination: {
-        total,
-        page: pageNum,
-        limit: limitNum,
-        totalPages: Math.ceil(total / limitNum),
-      },
-    });
-  } catch (error) {
-    console.log(error);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    return NextResponse.json({ data }, { status: 200 });
+  } catch (err) {
+    return NextResponse.json({ error: "Server Error" }, { status: 500 });
   }
 }
 
 export async function POST(req) {
   try {
     const authHeader = req.headers.get("authorization");
-    if (!authHeader) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+
+    if (!authHeader?.startsWith("Bearer "))
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
 
     const token = authHeader.split(" ")[1];
-    const decoded = verifyToken(token);
+    const user = verifyToken(token);
 
-    if (!decoded || !["admin", "staff"].includes(decoded.role)) {
+    if (!user || !["admin", "staff"].includes(user.role))
       return NextResponse.json(
-        { error: "Access denied: Admin/Staff only" },
+        { error: "Forbidden" },
         { status: 403 }
       );
-    }
 
     const body = await req.json();
-    const { name, category, price, weight, image } = body;
-
-    if (!name || !category || !price) {
-      return NextResponse.json(
-        { error: "Name, category & price are required" },
-        { status: 400 }
-      );
-    }
 
     const newItem = await prisma.jewellery.create({
-      data: { name, category, price: Number(price), weight, image },
+      data: {
+        name: body.name,
+        category: body.category.toLowerCase(),
+        price: parseFloat(body.price),
+        weight: body.weight ? parseFloat(body.weight) : null,
+        image: body.image,
+      },
     });
 
     return NextResponse.json(
-      { success: true, message: "Item created", item: newItem },
+      { message: "Created", data: newItem },
       { status: 201 }
     );
-  } catch (error) {
-    console.log(error);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  } catch (err) {
+    return NextResponse.json(
+      { error: err.message || "Server Error" },
+      { status: 500 }
+    );
   }
 }

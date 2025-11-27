@@ -9,7 +9,7 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userName, setUserName] = useState("");
+  const [user, setUser] = useState(null);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -22,13 +22,16 @@ export default function Navbar() {
     const token = localStorage.getItem("token");
     if (!token) return;
 
-    setIsLoggedIn(true);
-
     fetch("/api/me", {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
-      .then((data) => setUserName(data?.user?.name || "Profile"))
+      .then((data) => {
+        if (data?.user) {
+          setUser(data.user);
+          setIsLoggedIn(true);
+        }
+      })
       .catch(() => setIsLoggedIn(false));
   }, []);
 
@@ -45,6 +48,7 @@ export default function Navbar() {
   const logout = () => {
     localStorage.removeItem("token");
     setIsLoggedIn(false);
+    setUser(null);
     setProfileMenuOpen(false);
     window.location.href = "/login";
   };
@@ -52,9 +56,7 @@ export default function Navbar() {
   return (
     <header
       className={`fixed top-0 w-full z-40 transition-all duration-300 ${
-        isScrolled
-          ? "bg-white/70 backdrop-blur-md shadow-sm"
-          : "bg-transparent"
+        isScrolled ? "bg-white/70 backdrop-blur-md shadow-sm" : "bg-transparent"
       }`}
     >
       <div className="container mx-auto px-4 py-4">
@@ -90,10 +92,16 @@ export default function Navbar() {
               Contact
             </button>
 
+            {user?.role === "admin" && (
+              <Link href="/admin" className="text-black font-medium hover:text-yellow-600">
+                Admin Panel
+              </Link>
+            )}
+
             {!isLoggedIn ? (
               <Link
                 href="/login"
-                className="ml-4 px-4 py-2 bg-primary text-black rounded-md flex items-center gap-2 hover:opacity-90"
+                className="ml-4 px-4 py-2 bg-yellow-500 text-black rounded-md flex items-center gap-2 hover:bg-yellow-600"
               >
                 <User className="h-4 w-4" />
                 Login
@@ -105,10 +113,9 @@ export default function Navbar() {
                   className="flex items-center gap-2 bg-yellow-500 px-4 py-2 rounded-md text-black hover:bg-yellow-600"
                 >
                   <User className="h-5 w-5" />
-                  {userName?.split(" ")[0]}
+                  {user?.name?.split(" ")[0] || "Profile"}
                 </button>
 
-                {/* Dropdown */}
                 {profileMenuOpen && (
                   <div className="absolute right-0 mt-2 w-36 bg-white shadow-md rounded-md p-2 animate-fadeIn z-50">
                     <button
@@ -133,25 +140,23 @@ export default function Navbar() {
         </div>
 
         {isMobileMenuOpen && (
-          <div className="md:hidden mt-4 pb-4 border-t border-border">
+          <div className="md:hidden mt-4 pb-4 border-t border-gray-300">
             <nav className="flex flex-col mt-4 space-y-4">
-              <button onClick={() => scrollTo("home")} className="text-left font-medium">
-                Home
-              </button>
-              <button onClick={() => scrollTo("about")} className="text-left font-medium">
-                About Us
-              </button>
-              <button onClick={() => scrollTo("collection")} className="text-left font-medium">
-                Catalogue
-              </button>
-              <button onClick={() => scrollTo("contact")} className="text-left font-medium">
-                Contact
-              </button>
+              <button onClick={() => scrollTo("home")} className="text-left font-medium">Home</button>
+              <button onClick={() => scrollTo("about")} className="text-left font-medium">About Us</button>
+              <button onClick={() => scrollTo("collection")} className="text-left font-medium">Catalogue</button>
+              <button onClick={() => scrollTo("contact")} className="text-left font-medium">Contact</button>
+
+              {user?.role === "admin" && (
+                <Link href="/admin" className="text-left font-medium">
+                  Admin Panel
+                </Link>
+              )}
 
               {!isLoggedIn ? (
                 <Link
                   href="/login"
-                  className="px-4 py-2 bg-primary text-white rounded-md flex items-center gap-2 justify-center"
+                  className="px-4 py-2 bg-yellow-500 text-black rounded-md flex items-center gap-2 justify-center"
                 >
                   <User className="h-4 w-4" />
                   Login

@@ -4,8 +4,12 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Menu, X, User } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function Navbar() {
+  const pathname = usePathname();
+  const router = useRouter();
+
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -49,8 +53,17 @@ export default function Navbar() {
     localStorage.removeItem("token");
     setIsLoggedIn(false);
     setUser(null);
-    setProfileMenuOpen(false);
-    window.location.href = "/login";
+    router.push("/login");
+  };
+
+  const goToSection = (id) => {
+    if (pathname !== "/") {
+      router.push(`/#${id}`);
+      return;
+    }
+
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
@@ -76,19 +89,19 @@ export default function Navbar() {
 
           <nav className="hidden md:flex items-center space-x-8">
 
-            <button onClick={() => scrollTo("home")} className="text-black hover:text-yellow-600 font-medium">
+            <button onClick={() => goToSection("home")} className="text-black hover:text-yellow-600 font-medium">
               Home
             </button>
 
-            <button onClick={() => scrollTo("about")} className="text-black hover:text-yellow-600 font-medium">
+            <button onClick={() => goToSection("about")} className="text-black hover:text-yellow-600 font-medium">
               About Us
             </button>
 
-            <button onClick={() => scrollTo("collection")} className="text-black hover:text-yellow-600 font-medium">
+            <button onClick={() => goToSection("collection")} className="text-black hover:text-yellow-600 font-medium">
               Catalogue
             </button>
 
-            <button onClick={() => scrollTo("contact")} className="text-black hover:text-yellow-600 font-medium">
+            <button onClick={() => goToSection("contact")} className="text-black hover:text-yellow-600 font-medium">
               Contact
             </button>
 
@@ -117,7 +130,7 @@ export default function Navbar() {
                 </button>
 
                 {profileMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-36 bg-white shadow-md rounded-md p-2 animate-fadeIn z-50">
+                  <div className="absolute right-0 mt-2 w-36 bg-white shadow-md rounded-md p-2 z-50">
                     <button
                       onClick={logout}
                       className="w-full text-left text-black px-3 py-2 hover:bg-gray-100 rounded"
@@ -142,10 +155,11 @@ export default function Navbar() {
         {isMobileMenuOpen && (
           <div className="md:hidden mt-4 pb-4 border-t border-gray-300">
             <nav className="flex flex-col mt-4 space-y-4">
-              <button onClick={() => scrollTo("home")} className="text-left font-medium">Home</button>
-              <button onClick={() => scrollTo("about")} className="text-left font-medium">About Us</button>
-              <button onClick={() => scrollTo("collection")} className="text-left font-medium">Catalogue</button>
-              <button onClick={() => scrollTo("contact")} className="text-left font-medium">Contact</button>
+
+              <button onClick={() => goToSection("home")} className="text-left font-medium">Home</button>
+              <button onClick={() => goToSection("about")} className="text-left font-medium">About Us</button>
+              <button onClick={() => goToSection("collection")} className="text-left font-medium">Catalogue</button>
+              <button onClick={() => goToSection("contact")} className="text-left font-medium">Contact</button>
 
               {user?.role === "admin" && (
                 <Link href="/admin" className="text-left font-medium">
@@ -177,9 +191,4 @@ export default function Navbar() {
       </div>
     </header>
   );
-}
-
-function scrollTo(id) {
-  const el = document.getElementById(id);
-  if (el) el.scrollIntoView({ behavior: "smooth" });
 }

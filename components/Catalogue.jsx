@@ -2,19 +2,24 @@
 
 import Image from "next/image";
 import { Sparkles, ArrowRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const Collection = () => {
+  const router = useRouter();
+
   const items = [
     {
       id: 1,
+      slug: "necklaces",
       title: "Necklaces",
       description: "Exquisite handcrafted designs for every occasion",
-      image: "/necklace.jpg", 
+      image: "/necklace.jpg",
       popular: "Bridal Sets",
       delay: "0s",
     },
     {
       id: 2,
+      slug: "rings",
       title: "Rings",
       description: "Engagement rings, solitaires and elegant bands",
       image: "/rings.jpg",
@@ -23,6 +28,7 @@ const Collection = () => {
     },
     {
       id: 3,
+      slug: "earrings",
       title: "Earrings",
       description: "From timeless studs to luxurious chandeliers",
       image: "/earrings.jpg",
@@ -31,6 +37,7 @@ const Collection = () => {
     },
     {
       id: 4,
+      slug: "bangles",
       title: "Bangles",
       description: "Traditional and modern bangles crafted with love",
       image: "/bangles.jpg",
@@ -38,6 +45,10 @@ const Collection = () => {
       delay: "0.45s",
     },
   ];
+
+  const openCategory = (slug) => {
+    router.push(`/catalogue/${slug}`);
+  };
 
   return (
     <section
@@ -48,6 +59,7 @@ const Collection = () => {
       <div className="absolute bottom-0 right-0 w-72 h-72 bg-yellow-300/25 blur-[120px] rounded-full"></div>
 
       <div className="container mx-auto px-6 relative z-10">
+
         <div className="text-center mb-20">
           <div className="inline-flex items-center justify-center gap-2 mb-4">
             <Sparkles className="text-yellow-600 w-5 h-5" />
@@ -69,10 +81,12 @@ const Collection = () => {
           {items.map((item) => (
             <div
               key={item.id}
+              onClick={() => openCategory(item.slug)}
               style={{ animationDelay: item.delay }}
               className="group cursor-pointer opacity-100"
             >
               <div className="relative bg-white/80 backdrop-blur-xl shadow-lg border border-yellow-100 rounded-2xl overflow-hidden transition-all duration-500 group-hover:shadow-2xl group-hover:scale-105">
+                
                 <div className="relative h-64 w-full overflow-hidden">
                   <Image
                     src={item.image}

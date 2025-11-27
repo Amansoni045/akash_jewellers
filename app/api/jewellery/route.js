@@ -4,55 +4,60 @@ import { verifyToken } from "@/lib/auth";
 
 export async function GET(req) {
   try {
-    const url = new URL(req.url);
+    const { search, sort, page, limit, category } = Object.fromEntries(
+      new URL(req.url).searchParams
+    );
 
-    const page = Number(url.searchParams.get("page")) || 1;
-    const limit = Number(url.searchParams.get("limit")) || 10;
-    const search = url.searchParams.get("search") || "";
-    const sort = url.searchParams.get("sort") || "createdAt_desc";
-    const category = url.searchParams.get("category") || "";
+    const pageNum = Number(page) || 1;
+    const limitNum = Number(limit) || 10;
+    const skip = (pageNum - 1) * limitNum;
 
-    const skip = (page - 1) * limit;
-
-    const orderBy = (() => {
-      switch (sort) {
-        case "price_asc": return { price: "asc" };
-        case "price_desc": return { price: "desc" };
-        case "name_asc": return { name: "asc" };
-        case "name_desc": return { name: "desc" };
-        default: return { createdAt: "desc" };
-      }
-    })();
+    let orderBy = {};
+    if (sort) {
+      const [field, direction] = sort.split("_");
+      orderBy[field] = direction;
+    } else {
+      orderBy = { createdAt: "desc" };
+    }
 
     const where = {
       AND: [
-        search ? { name: { contains: search, mode: "insensitive" } } : {},
-        category ? { category } : {}
-      ]
+        category ? { category: { equals: category, mode: "insensitive" } } : {},
+        search
+          ? {
+              OR: [
+                { name: { contains: search, mode: "insensitive" } },
+                { category: { contains: search, mode: "insensitive" } },
+              ],
+            }
+          : {},
+      ],
     };
 
-    const items = await prisma.jewellery.findMany({
+    const data = await prisma.jewellery.findMany({
       where,
+      orderBy,
       skip,
-      take: limit,
-      orderBy
+      take: limitNum,
     });
 
     const total = await prisma.jewellery.count({ where });
 
     return NextResponse.json({
-      page,
-      limit,
-      total,
-      data: items
+      success: true,
+      data,
+      pagination: {
+        total,
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(total / limitNum),
+      },
     });
-
-  } catch (err) {
-    console.error("GET jewellery:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (error) {
+    console.log(error);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
-
 
 export async function POST(req) {
   try {
@@ -62,26 +67,35 @@ export async function POST(req) {
     }
 
     const token = authHeader.split(" ")[1];
-    const user = verifyToken(token);
+    const decoded = verifyToken(token);
 
-    if (!user || (user.role !== "admin" && user.role !== "staff")) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (!decoded || !["admin", "staff"].includes(decoded.role)) {
+      return NextResponse.json(
+        { error: "Access denied: Admin/Staff only" },
+        { status: 403 }
+      );
     }
 
-    const { name, category, price, weight, image } = await req.json();
+    const body = await req.json();
+    const { name, category, price, weight, image } = body;
 
     if (!name || !category || !price) {
-      return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Name, category & price are required" },
+        { status: 400 }
+      );
     }
 
-    const item = await prisma.jewellery.create({
-      data: { name, category, price: Number(price), weight, image }
+    const newItem = await prisma.jewellery.create({
+      data: { name, category, price: Number(price), weight, image },
     });
 
-    return NextResponse.json({ message: "Jewellery added", item });
-
-  } catch (err) {
-    console.error("POST jewellery:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json(
+      { success: true, message: "Item created", item: newItem },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.log(error);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

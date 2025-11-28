@@ -28,14 +28,12 @@ model Jewellery {
 }
 
 model Contact {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   name      String
   email     String
   phone     String?
   message   String
-  archived  Boolean  @default(false)
   reply     String?
   repliedAt DateTime?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 }
-

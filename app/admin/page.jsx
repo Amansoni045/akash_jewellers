@@ -24,7 +24,6 @@ export default function AdminPage() {
   const [page, setPage] = useState(1);
   const limit = 6;
 
-  // ⭐ Validate Admin
   useEffect(() => {
     async function validateAdmin() {
       const token = localStorage.getItem("token");
@@ -47,7 +46,6 @@ export default function AdminPage() {
     validateAdmin();
   }, [router]);
 
-  // ⭐ Load Items
   const loadItems = async () => {
     try {
       const res = await api.get(
@@ -63,7 +61,6 @@ export default function AdminPage() {
     loadItems();
   }, [page, search, sort]);
 
-  // ⭐ Submit (Add / Update)
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -97,7 +94,6 @@ export default function AdminPage() {
     }
   };
 
-  // ⭐ Delete Item
   const handleDelete = async (id) => {
     const token = localStorage.getItem("token");
     if (!confirm("Delete this item?")) return;
@@ -122,7 +118,6 @@ export default function AdminPage() {
     }
   };
 
-  // ⭐ Edit Item Fill
   const handleEdit = (item) => {
     setEditId(item.id);
     setForm({
@@ -139,7 +134,6 @@ export default function AdminPage() {
 
       <h1 className="text-4xl font-bold text-center mb-10">Admin Dashboard</h1>
 
-      {/* Form */}
       <div className="bg-white p-8 rounded-xl shadow-md border mb-12">
         <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
           <Plus className="w-6 h-6 text-yellow-600" />
@@ -157,7 +151,6 @@ export default function AdminPage() {
             onChange={(e) => setForm({ ...form, name: e.target.value })}
           />
 
-          {/* ⭐ CATEGORY SELECT */}
           <select
             className="p-3 border rounded-lg"
             value={form.category}
@@ -202,7 +195,6 @@ export default function AdminPage() {
         </form>
       </div>
 
-      {/* List Items */}
       <div className="grid md:grid-cols-3 gap-8">
         {items.map((item) => (
           <div key={item.id} className="bg-white p-5 rounded-xl shadow-md border">

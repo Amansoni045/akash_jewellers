@@ -134,16 +134,24 @@ const Collection = () => {
             life.
           </p>
 
-          <button
-            onClick={() =>
-              document.getElementById("contact")?.scrollIntoView({
-                behavior: "smooth",
-              })
-            }
-            className="px-10 py-3 bg-yellow-500 text-white font-medium rounded-full shadow-lg hover:bg-yellow-600 hover:shadow-2xl transition-all"
-          >
-            Custom Design Request
-          </button>
+<button
+  onClick={() => {
+    const base = window.location.origin;
+
+    if (window.location.pathname !== "/") {
+      window.location.href = `${base}/#contact`;
+    } else {
+      document
+        .getElementById("contact")
+        ?.scrollIntoView({ behavior: "smooth" });
+    }
+  }}
+  className="px-10 py-3 bg-yellow-500 text-white font-medium rounded-full shadow-lg hover:bg-yellow-600 hover:shadow-2xl transition-all"
+>
+  Custom Design Request
+</button>
+
+
         </div>
       </div>
     </section>

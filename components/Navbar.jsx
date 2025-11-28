@@ -26,9 +26,7 @@ export default function Navbar() {
     const token = localStorage.getItem("token");
     if (!token) return;
 
-    fetch("/api/me", {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    fetch("/api/me", { headers: { Authorization: `Bearer ${token}` } })
       .then((res) => res.json())
       .then((data) => {
         if (data?.user) {
@@ -40,37 +38,45 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    function handleClickOutside(e) {
-      if (!e.target.closest(".profile-menu")) {
-        setProfileMenuOpen(false);
-      }
-    }
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
+    const close = (e) => {
+      if (!e.target.closest(".profile-menu")) setProfileMenuOpen(false);
+    };
+    document.addEventListener("click", close);
+    return () => document.removeEventListener("click", close);
   }, []);
 
   const logout = () => {
     localStorage.removeItem("token");
-    setIsLoggedIn(false);
     setUser(null);
+    setIsLoggedIn(false);
     router.push("/login");
   };
 
   const goToSection = (id) => {
-    if (pathname !== "/") {
-      router.push(`/#${id}`);
+    if (window.location.pathname !== "/") {
+      sessionStorage.setItem("scrollTarget", id);
+      router.push("/");
       return;
     }
-
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };
 
+  useEffect(() => {
+    const target = sessionStorage.getItem("scrollTarget");
+    if (target && pathname === "/") {
+      const el = document.getElementById(target);
+      if (el) {
+        setTimeout(() => el.scrollIntoView({ behavior: "smooth" }), 300);
+      }
+      sessionStorage.removeItem("scrollTarget");
+    }
+  }, [pathname]);
+
   return (
     <header
-      className={`fixed top-0 w-full z-40 transition-all duration-300 ${
-        isScrolled ? "bg-white/70 backdrop-blur-md shadow-sm" : "bg-transparent"
-      }`}
+      className={`fixed top-0 w-full z-40 transition-all duration-300 ${isScrolled ? "bg-white/70 backdrop-blur-md shadow-sm" : "bg-transparent"
+        }`}
     >
       <div className="container mx-auto px-4 py-4">
 
@@ -83,54 +89,76 @@ export default function Navbar() {
               width={120}
               height={60}
               className="h-14 w-auto cursor-pointer hover:scale-110 transition-transform"
-              priority
             />
           </Link>
 
           <nav className="hidden md:flex items-center space-x-8">
 
-            <button onClick={() => goToSection("home")} className="text-black hover:text-yellow-600 font-medium">
+            <button
+              onClick={() => goToSection("home")}
+              className="text-black hover:text-yellow-600 font-medium"
+            >
               Home
             </button>
 
-            <button onClick={() => goToSection("about")} className="text-black hover:text-yellow-600 font-medium">
+            <button
+              onClick={() => goToSection("about")}
+              className="text-black hover:text-yellow-600 font-medium"
+            >
               About Us
             </button>
 
-            <button onClick={() => goToSection("collection")} className="text-black hover:text-yellow-600 font-medium">
+            <button
+              onClick={() => goToSection("collection")}
+              className="text-black hover:text-yellow-600 font-medium"
+            >
               Catalogue
             </button>
 
-            <button onClick={() => goToSection("contact")} className="text-black hover:text-yellow-600 font-medium">
+            <button
+              onClick={() => goToSection("contact")}
+              className="text-black hover:text-yellow-600 font-medium"
+            >
               Contact
             </button>
 
+
             {user?.role === "admin" && (
-              <Link href="/admin" className="text-black font-medium hover:text-yellow-600">
-                Admin Panel
-              </Link>
+              <>
+                <Link
+                  href="/admin/messages"
+                  className="text-black font-medium hover:text-yellow-600"
+                >
+                  Messages
+                </Link>
+                <Link
+                  href="/admin"
+                  className="text-black font-medium hover:text-yellow-600"
+                >
+                  Admin Panel
+                </Link>
+              </>
             )}
 
             {!isLoggedIn ? (
               <Link
                 href="/login"
-                className="ml-4 px-4 py-2 bg-yellow-500 text-black rounded-md flex items-center gap-2 hover:bg-yellow-600"
+                className="px-4 py-2 bg-yellow-500 text-black rounded-md flex items-center gap-2 hover:bg-yellow-600"
               >
-                <User className="h-4 w-4" />
-                Login
+                <User className="h-4 w-4" /> Login
               </Link>
             ) : (
               <div className="relative ml-4 profile-menu">
                 <button
-                  onClick={() => setProfileMenuOpen((prev) => !prev)}
+                  onClick={() => setProfileMenuOpen(!profileMenuOpen)}
                   className="flex items-center gap-2 bg-yellow-500 px-4 py-2 rounded-md text-black hover:bg-yellow-600"
                 >
                   <User className="h-5 w-5" />
-                  {user?.name?.split(" ")[0] || "Profile"}
+                  {user?.name?.split(" ")[0] || "User"}
                 </button>
 
                 {profileMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-36 bg-white shadow-md rounded-md p-2 z-50">
+                  <div className="absolute right-0 mt-2 w-40 bg-white shadow-md rounded-md p-2 z-50">
                     <button
                       onClick={logout}
                       className="w-full text-left text-black px-3 py-2 hover:bg-gray-100 rounded"
@@ -141,7 +169,6 @@ export default function Navbar() {
                 )}
               </div>
             )}
-
           </nav>
 
           <button
@@ -159,12 +186,21 @@ export default function Navbar() {
               <button onClick={() => goToSection("home")} className="text-left font-medium">Home</button>
               <button onClick={() => goToSection("about")} className="text-left font-medium">About Us</button>
               <button onClick={() => goToSection("collection")} className="text-left font-medium">Catalogue</button>
-              <button onClick={() => goToSection("contact")} className="text-left font-medium">Contact</button>
+
+              <button onClick={() => goToSection("contact")} className="text-left font-medium">
+                Contact
+              </button>
+
 
               {user?.role === "admin" && (
-                <Link href="/admin" className="text-left font-medium">
-                  Admin Panel
-                </Link>
+                <>
+                  <Link href="/admin/messages" className="text-left font-medium">
+                    Messages
+                  </Link>
+                  <Link href="/admin" className="text-left font-medium">
+                    Admin Panel
+                  </Link>
+                </>
               )}
 
               {!isLoggedIn ? (
@@ -172,22 +208,19 @@ export default function Navbar() {
                   href="/login"
                   className="px-4 py-2 bg-yellow-500 text-black rounded-md flex items-center gap-2 justify-center"
                 >
-                  <User className="h-4 w-4" />
-                  Login
+                  <User className="h-4 w-4" /> Login
                 </Link>
               ) : (
                 <button
                   onClick={logout}
                   className="px-4 py-2 bg-yellow-500 text-black rounded-md flex items-center gap-2 justify-center"
                 >
-                  <User className="h-4 w-4" />
-                  Logout
+                  <User className="h-4 w-4" /> Logout
                 </button>
               )}
             </nav>
           </div>
         )}
-
       </div>
     </header>
   );

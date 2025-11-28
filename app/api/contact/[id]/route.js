@@ -5,7 +5,7 @@ import { sendResendEmail } from "@/lib/sendEmail";
 
 export async function PATCH(req, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     if (!id) {
       return NextResponse.json({ error: "Missing id" }, { status: 400 });
@@ -78,7 +78,7 @@ export async function PATCH(req, { params }) {
 
 export async function DELETE(req, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     if (!id) {
       return NextResponse.json({ error: "Missing id" }, { status: 400 });

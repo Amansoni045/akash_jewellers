@@ -5,7 +5,6 @@ Customers can browse collections & send enquiries, while admins can manage jewel
 
 **Live Link:** https://akash-jewellers.vercel.app
 
-
 ## Features
 
 ### Authentication

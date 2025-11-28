@@ -23,7 +23,7 @@ export async function POST(req) {
       data: { name, email, phone, message },
     });
 
-    sendResendEmail({
+    await sendResendEmail({
       to: ADMIN_EMAIL,
       subject: `📩 New Message From ${name}`,
       html: `
@@ -37,12 +37,12 @@ export async function POST(req) {
     });
 
     if (ADMIN_WHATSAPP) {
-      sendWhatsApp({
+      await sendWhatsApp({
         to: ADMIN_WHATSAPP,
         message: `New inquiry from ${name}\n\n${message}`,
       });
     }
-    sendResendEmail({
+    await sendResendEmail({
       to: email,
       subject: "Thank You — We Received Your Message",
       html: `

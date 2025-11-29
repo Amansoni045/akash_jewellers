@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import api from "@/lib/axios";
-import { useParams } from "next/navigation";
+import { useParams,useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 
 export default function CategoryPage() {
+  const router = useRouter(); 
   const { category } = useParams();
   const [items, setItems] = useState([]);
   const [search, setSearch] = useState("");
@@ -93,7 +94,10 @@ export default function CategoryPage() {
                 ₹ {item.price}
               </p>
 
-              <button className="mt-4 flex items-center gap-2 text-yellow-700 hover:text-yellow-800 font-medium">
+              <button
+                onClick={() => router.push(`/catalogue/item/${item.id}`)}
+                className="mt-4 flex items-center gap-2 text-yellow-700 hover:text-yellow-800 font-medium"
+              >
                 View Details <ArrowRight size={16} />
               </button>
             </div>

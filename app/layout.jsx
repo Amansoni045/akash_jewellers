@@ -1,5 +1,6 @@
 import "./globals.css";
 import Navbar from "@/components/Navbar.jsx";
+import Footer from "@/components/Footer.jsx";
 
 export const metadata = {
   title: "Akash Jewellers",
@@ -14,6 +15,7 @@ export default function RootLayout({ children }) {
         <main className="w-full min-h-screen bg-white text-black !bg-white !text-black">
           {children}
         </main>
+        <Footer />
       </body>
     </html>
   );

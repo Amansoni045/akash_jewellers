@@ -133,39 +133,6 @@ ADMIN_WHATSAPP_NUMBER=
 
 ---
 
-## 📌 Proposal (As Required in README)
-
-### **Problem Statement**
-Local jewellery shops still use offline methods for inventory & customer management.  
-This project digitizes Akash Jewellers, enabling:
-
-- Online catalogue  
-- Customer enquiries  
-- Admin inventory management  
-- Automated communication  
-
-### **Goal**
-Bring traditional jewellery business online with a modern, mobile-first system.
-
----
-
-## 🎤 Evaluation Preparation (1:1 Round Ready)
-
-### **Past Experience**
-- Web developer (React, Next.js)
-- Multiple personal projects
-
-### **Tech Strengths**
-- React, Next.js, Tailwind  
-- Node.js, Prisma  
-- JWT auth  
-- API design  
-
-### **Biggest Challenge**
-Handling email + WhatsApp integration → solved using Resend + Twilio + async API patch routes.
-
----
-
 ## ✔ Final Notes
 This project fully satisfies:
 
@@ -179,16 +146,3 @@ This project fully satisfies:
 - Live deployed link  
 
 ```
-
----
-
-# 🎉 **Your README is now PERFECT for college evaluation.**  
-Short, clean, professional, and EXACTLY matching your project.
-
-If you want, I can also create:
-
-🔥 A PDF summary  
-🔥 A presentation slide deck  
-🔥 A short project explanation script for viva  
-
-Just tell me!

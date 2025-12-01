@@ -1,56 +1,116 @@
 # Akash Jewellers – Smart Jewellery Store Management System
 
-A modern jewellery website built for my family shop **Akash Jewellers (Pali, Korba)**.  
-Customers can browse collections and send enquiries, while admins can manage jewellery items and reply to messages.
+A modern, mobile-first jewellery platform built for Akash Jewellers (Pali, Korba) to digitalize product showcasing, customer communication, and backend inventory management.
 
-### 🔗 Live Project  
-**https://akash-jewellers.vercel.app**
+This project is submitted as my Capstone Project at Newton School of Technology.
 
 ---
 
-## ⭐ Features
+## Live Project Link
 
-### 🔐 Authentication
-- JWT-based Login & Signup  
-- Role-based access (Admin / User)
-
-### 💎 Jewellery Catalogue
-- Category-wise browsing (Necklaces, Rings, Earrings, Bangles)
-- Search, Sort, Filter  
-- Pagination  
-- Product Details Page  
-
-### 🛠 Admin Panel
-- Add Jewellery  
-- Edit Jewellery  
-- Delete Jewellery  
-- Manage customer messages  
-- Reply to messages (email sent automatically)
-
-### 📩 Contact System
-- Customers submit enquiries  
-- Admin receives email + WhatsApp alert  
-- Customer receives auto-reply email  
-- Admin can reply to enquiries
+Frontend (Hosted on Vercel):
+[https://akash-jewellers.vercel.app](https://akash-jewellers.vercel.app)
 
 ---
 
-## 🏗 Tech Stack
+# 1. Project Title
 
-| Layer | Technology |
-|-------|------------|
-| Frontend | Next.js 14, React, TailwindCSS |
-| Backend | Next.js API Routes (Serverless Functions) |
-| ORM | Prisma.io (Schema + Migrations + Client) |
-| Database | PostgreSQL (NeonDB Cloud) |
-| Auth | JWT |
-| Emails | Resend |
-| WhatsApp Alerts | Twilio |
-| Hosting | Vercel (Frontend + Backend), NeonDB (Database) |
+Akash Jewellers – Smart Jewellery Store Management System
 
 ---
 
-## 📁 Folder Structure (Important for Evaluation)
+# 2. Problem Statement
+
+Most local jewellery shops operate offline, which creates limitations:
+
+* No digital catalogue
+* Limited customer reach
+* Manual inventory management
+* Inefficient customer communication
+* No automated enquiry handling
+
+This project solves these problems by providing:
+
+* Online jewellery catalogue
+* Admin inventory management (CRUD)
+* Customer enquiry system
+* Auto email responses
+* WhatsApp notifications
+* Admin message reply system
+* Mobile-first responsive UI
+
+---
+
+# 3. System Architecture
+
+```
+Frontend (Next.js 14 – App Router)
+↓
+Backend (Next.js Route Handlers / API Routes)
+↓
+Database (Prisma ORM + PostgreSQL hosted on Prisma Data Platform)
+```
+
+Hosting:
+
+* Frontend + Backend: Vercel
+* Database: Prisma Data Platform (PostgreSQL)
+
+---
+
+# 4. Key Features
+
+Authentication
+
+* JWT login and signup
+* Admin-only dashboard access
+
+Jewellery Catalogue
+
+* Category-based browsing
+* Search, sort, filter
+* Pagination
+* Product detail page
+
+Admin Panel
+
+* Add jewellery (Create)
+* View all jewellery (Read)
+* Edit jewellery (Update)
+* Delete jewellery (Delete)
+* View customer messages
+* Reply to messages
+
+Contact System
+
+* Customer enquiries
+* Auto email to customer
+* Email + WhatsApp alert to admin
+* Admin can reply to messages
+
+Responsive Design
+
+* Fully responsive
+* Designed for mobile-first
+
+---
+
+# 5. Tech Stack
+
+| Layer           | Technology                        |
+| --------------- | --------------------------------- |
+| Frontend        | Next.js 14, React, TailwindCSS    |
+| Backend         | Next.js Route Handlers            |
+| ORM             | Prisma ORM                        |
+| Database        | PostgreSQL (Prisma Data Platform) |
+| Authentication  | JWT                               |
+| Email Service   | Resend                            |
+| WhatsApp Alerts | Twilio                            |
+| Hosting         | Vercel                            |
+
+---
+
+# 6. Folder Structure
 
 ```
 ├── app
@@ -75,74 +135,141 @@ Customers can browse collections and send enquiries, while admins can manage jew
 │   ├── register/page.jsx
 │   ├── layout.jsx
 │   └── page.jsx
-├── prisma/schema.prisma
+├── prisma
+│   └── schema.prisma
 └── public (images)
 ```
 
 ---
 
-## 🔌 API Endpoints (CRUD Requirements Covered)
+# 7. CRUD API Endpoints (With Copy-Paste Examples)
 
-### **Jewellery (CRUD Fully Implemented)**
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/jewellery` | List items (search + sort + pagination + category filter) |
-| POST | `/api/jewellery` | Create new item |
-| PUT | `/api/jewellery/:id` | Update item |
-| DELETE | `/api/jewellery/:id` | Delete item |
-
-### **Contact Messages**
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/contact` | Submit enquiry |
-| GET | `/api/contact` | Admin read messages |
-| PATCH | `/api/contact/:id` | Reply to message (email sent) |
-| DELETE | `/api/contact/:id` | Delete message |
-
-### **Auth**
-| Method | Endpoint |
-|--------|----------|
-| POST | `/api/register` |
-| POST | `/api/login` |
-| GET | `/api/me` |
-
-✔ Satisfies **minimum 2 Create, 2 Read, 2 Update, 2 Delete** requirement.
+Below are endpoints evaluators can test directly.
 
 ---
 
-## 🧪 How to Run Locally
+## Authentication APIs
 
-```bash
+Register User
+
+```
+curl -X POST https://akash-jewellers.vercel.app/api/register \
+-H "Content-Type: application/json" \
+-d '{"name":"Aman","email":"aman@test.com","password":"12345678"}'
+```
+
+Login
+
+```
+curl -X POST https://akash-jewellers.vercel.app/api/login \
+-H "Content-Type: application/json" \
+-d '{"email":"aman@test.com","password":"12345678"}'
+```
+
+---
+
+## Jewellery CRUD (Admin Only)
+
+Create Jewellery
+
+```
+curl -X POST https://akash-jewellers.vercel.app/api/jewellery \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer <TOKEN>" \
+-d '{"name":"Gold Ring","category":"rings","price":15000,"weight":5,"image":"/rings.jpg"}'
+```
+
+Read Jewellery with search/filter/sort
+
+```
+curl "https://akash-jewellers.vercel.app/api/jewellery?search=ring&sort=price_desc"
+```
+
+Update Jewellery
+
+```
+curl -X PUT https://akash-jewellers.vercel.app/api/jewellery/<ID> \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer <TOKEN>" \
+-d '{"name":"Updated Ring","category":"rings","price":12000}'
+```
+
+Delete Jewellery
+
+```
+curl -X DELETE https://akash-jewellers.vercel.app/api/jewellery/<ID> \
+-H "Authorization: Bearer <TOKEN>"
+```
+
+---
+
+## Contact & Enquiries
+
+Submit Contact Form
+
+```
+curl -X POST https://akash-jewellers.vercel.app/api/contact \
+-H "Content-Type: application/json" \
+-d '{"name":"Ravi","email":"customer@test.com","phone":"9999999999","message":"Need bridal ring"}'
+```
+
+Get All Messages (Admin)
+
+```
+curl -H "Authorization: Bearer <TOKEN>" \
+https://akash-jewellers.vercel.app/api/contact
+```
+
+Reply to Message
+
+```
+curl -X PATCH https://akash-jewellers.vercel.app/api/contact/<ID> \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer <TOKEN>" \
+-d '{"action":"reply","replyText":"Thanks for contacting Akash Jewellers"}'
+```
+
+Delete Message
+
+```
+curl -X DELETE https://akash-jewellers.vercel.app/api/contact/<ID> \
+-H "Authorization: Bearer <TOKEN>"
+```
+
+---
+
+# 8. How to Run Locally
+
+Clone repository
+
+```
+git clone <repo-url>
+cd akash-jewellers
+```
+
+Install dependencies
+
+```
 npm install
+```
+
+Environment variables (.env)
+
+```
+DATABASE_URL=your_prisma_accelerate_database_url
+JWT_SECRET=your_secret
+RESEND_API_KEY=your_resend_key
+EMAIL_FROM=your_email
+ADMIN_EMAIL=your_email
+TWILIO_ACCOUNT_SID=your_sid
+TWILIO_AUTH_TOKEN=your_token
+TWILIO_WHATSAPP_NUMBER=whatsapp:+14155238886
+ADMIN_WHATSAPP_NUMBER=whatsapp:+91XXXXXXXXXX
+```
+
+Run development server
+
+```
 npm run dev
 ```
 
-Create a `.env` file with:
-
-```
-DATABASE_URL=
-JWT_SECRET=
-RESEND_API_KEY=
-EMAIL_FROM=
-TWILIO_ACCOUNT_SID=
-TWILIO_AUTH_TOKEN=
-TWILIO_WHATSAPP_NUMBER=
-ADMIN_EMAIL=
-ADMIN_WHATSAPP_NUMBER=
-```
-
----
-
-## ✔ Final Notes
-This project fully satisfies:
-
-- Backend CRUD  
-- Search, Sort, Pagination  
-- Hosting verification  
-- Documentation requirement  
-- Problem statement matching  
-- Authentication  
-- Admin roles  
-- Live deployed link  
-
-```

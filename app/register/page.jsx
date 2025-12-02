@@ -4,11 +4,12 @@ import { useState, useEffect, useRef } from "react";
 import api from "@/lib/axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { X } from "lucide-react";
+import { X, Eye, EyeOff } from "lucide-react";
 
 export default function RegisterPage() {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [msg, setMsg] = useState("");
+  const [showPass, setShowPass] = useState(false);
   const modalRef = useRef(null);
   const router = useRouter();
 
@@ -87,15 +88,25 @@ export default function RegisterPage() {
             className="w-full p-3 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-yellow-400/50"
           />
 
-          <input
-            value={form.password}
-            onChange={(e) =>
-              setForm({ ...form, password: e.target.value })
-            }
-            type="password"
-            placeholder="Password"
-            className="w-full p-3 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-yellow-400/50"
-          />
+          <div className="relative">
+            <input
+              value={form.password}
+              onChange={(e) =>
+                setForm({ ...form, password: e.target.value })
+              }
+              type={showPass ? "text" : "password"}
+              placeholder="Password"
+              className="w-full p-3 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-yellow-400/50"
+            />
+
+            <button
+              type="button"
+              onClick={() => setShowPass(!showPass)}
+              className="absolute top-1/2 -translate-y-1/2 right-4 text-white/70 hover:text-white"
+            >
+              {showPass ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+          </div>
 
           <button className="w-full py-3 text-lg font-semibold rounded-lg bg-yellow-500 hover:bg-yellow-600 text-black shadow-md shadow-yellow-900/30 transition">
             Register

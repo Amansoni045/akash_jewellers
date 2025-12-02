@@ -63,7 +63,7 @@ export default function ContactPage() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-12 items-start">
-          {/* Contact Details */}
+
           <div className="bg-white/70 backdrop-blur-xl shadow-xl border border-yellow-100 rounded-2xl p-10">
             <h2 className="text-2xl font-semibold text-gray-900 mb-6 font-playfair">
               Get in Touch
@@ -109,7 +109,6 @@ export default function ContactPage() {
             </div>
           </div>
 
-          {/* Contact Form */}
           <form
             onSubmit={handleSubmit}
             className="bg-white/80 backdrop-blur-xl shadow-xl border border-yellow-100 rounded-2xl p-10"

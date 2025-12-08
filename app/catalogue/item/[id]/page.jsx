@@ -9,17 +9,16 @@ export default function ProductDetails() {
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const load = async () => {
-    try {
-      const res = await api.get(`/jewellery?id=${id}`);
-      setItem(res.data.data?.[0]);
-      setLoading(false);
-    } catch (err) {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await api.get(`/jewellery?id=${id}`);
+        setItem(res.data.data?.[0]);
+        setLoading(false);
+      } catch (err) {
+        setLoading(false);
+      }
+    };
     load();
   }, [id]);
 
@@ -44,22 +43,22 @@ export default function ProductDetails() {
         <p className="text-gray-700 mb-4">Weight: {item.weight} grams</p>
       )}
 
-    <button
-    className="px-6 py-3 bg-yellow-600 text-white rounded-lg"
-    onClick={() => {
-        const base = window.location.origin;
+      <button
+        className="px-6 py-3 bg-yellow-600 text-white rounded-lg"
+        onClick={() => {
+          const base = window.location.origin;
 
-        if (window.location.pathname !== "/") {
-        sessionStorage.setItem("scrollTarget", "contact");
-        window.location.href = "/";
-        } 
-        else {
-        document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
-        }
-    }}
-    >
-    Enquire Now
-    </button>
+          if (window.location.pathname !== "/") {
+            sessionStorage.setItem("scrollTarget", "contact");
+            window.location.href = "/";
+          }
+          else {
+            document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
+          }
+        }}
+      >
+        Enquire Now
+      </button>
 
     </div>
   );

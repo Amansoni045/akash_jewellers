@@ -46,18 +46,17 @@ export default function AdminPage() {
     validateAdmin();
   }, [router]);
 
-  const loadItems = async () => {
-    try {
-      const res = await api.get(
-        `/jewellery?page=${page}&limit=${limit}&search=${search}&sort=${sort}`
-      );
-      setItems(res.data.data);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
   useEffect(() => {
+    const loadItems = async () => {
+      try {
+        const res = await api.get(
+          `/jewellery?page=${page}&limit=${limit}&search=${search}&sort=${sort}`
+        );
+        setItems(res.data.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
     loadItems();
   }, [page, search, sort]);
 

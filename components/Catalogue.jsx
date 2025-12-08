@@ -86,7 +86,7 @@ const Collection = () => {
               className="group cursor-pointer opacity-100"
             >
               <div className="relative bg-white/80 backdrop-blur-xl shadow-lg border border-yellow-100 rounded-2xl overflow-hidden transition-all duration-500 group-hover:shadow-2xl group-hover:scale-105">
-                
+
                 <div className="relative h-64 w-full overflow-hidden">
                   <Image
                     src={item.image}
@@ -129,27 +129,27 @@ const Collection = () => {
             Looking for Something Special?
           </h3>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto mb-6">
-            We create custom jewellery crafted to perfection. Whether it's an
+            We create custom jewellery crafted to perfection. Whether it&apos;s an
             engagement ring or a family heirloom — we bring your dream design to
             life.
           </p>
 
-<button
-  onClick={() => {
-    const base = window.location.origin;
+          <button
+            onClick={() => {
+              const base = window.location.origin;
 
-    if (window.location.pathname !== "/") {
-      window.location.href = `${base}/#contact`;
-    } else {
-      document
-        .getElementById("contact")
-        ?.scrollIntoView({ behavior: "smooth" });
-    }
-  }}
-  className="px-10 py-3 bg-yellow-500 text-white font-medium rounded-full shadow-lg hover:bg-yellow-600 hover:shadow-2xl transition-all"
->
-  Custom Design Request
-</button>
+              if (window.location.pathname !== "/") {
+                window.location.href = `${base}/#contact`;
+              } else {
+                document
+                  .getElementById("contact")
+                  ?.scrollIntoView({ behavior: "smooth" });
+              }
+            }}
+            className="px-10 py-3 bg-yellow-500 text-white font-medium rounded-full shadow-lg hover:bg-yellow-600 hover:shadow-2xl transition-all"
+          >
+            Custom Design Request
+          </button>
 
 
         </div>

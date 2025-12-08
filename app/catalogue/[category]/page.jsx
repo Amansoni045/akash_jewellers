@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 import api from "@/lib/axios";
-import { useParams,useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 
 export default function CategoryPage() {
-  const router = useRouter(); 
+  const router = useRouter();
   const { category } = useParams();
   const [items, setItems] = useState([]);
   const [search, setSearch] = useState("");
@@ -16,23 +16,23 @@ export default function CategoryPage() {
   const formattedCategory =
     category.charAt(0).toUpperCase() + category.slice(1);
 
-  const loadData = async () => {
-    try {
-      setLoading(true);
-
-      const res = await api.get(
-        `/jewellery?category=${category}&search=${search}&sort=${sort}`
-      );
-
-      setItems(res.data.data);
-      setLoading(false);
-    } catch (err) {
-      console.log(err);
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const loadData = async () => {
+      try {
+        setLoading(true);
+
+        const res = await api.get(
+          `/jewellery?category=${category}&search=${search}&sort=${sort}`
+        );
+
+        setItems(res.data.data);
+        setLoading(false);
+      } catch (err) {
+        console.log(err);
+        setLoading(false);
+      }
+    };
+
     loadData();
   }, [category, search, sort]);
 

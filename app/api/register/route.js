@@ -31,6 +31,13 @@ export async function POST(req) {
       );
     }
 
+    if (!email.includes("@") || !email.endsWith(".com")) {
+      return NextResponse.json(
+        { error: "Invalid email" },
+        { status: 400 }
+      );
+    }
+
     const hashedPassword = await hashPassword(password);
 
     const newUser = await prisma.user.create({

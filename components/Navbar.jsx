@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Menu, X, User } from "lucide-react";
+import LivePrices from "./LivePrices";
 import { usePathname, useRouter } from "next/navigation";
 
 export default function Navbar() {
@@ -140,6 +141,8 @@ export default function Navbar() {
               </>
             )}
 
+            <LivePrices />
+
             {!isLoggedIn ? (
               <Link
                 href="/login"
@@ -202,6 +205,10 @@ export default function Navbar() {
                   </Link>
                 </>
               )}
+
+              <div className="flex justify-start">
+                <LivePrices />
+              </div>
 
               {!isLoggedIn ? (
                 <Link

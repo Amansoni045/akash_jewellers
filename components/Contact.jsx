@@ -105,7 +105,19 @@ export default function ContactPage() {
               <h3 className="text-xl font-semibold mb-3 font-playfair">
                 Business Hours
               </h3>
-              <p className="text-gray-600">Mon – Sun: 10:00 AM — 9:00 PM</p>
+              <p className="text-gray-600">Mon – Sun: 07:30 AM — 10:00 PM</p>
+            </div>
+
+            <div className="mt-8 rounded-xl overflow-hidden border border-yellow-500/30 shadow-md">
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3689.3184744131254!2d82.32389409999999!3d22.379348399999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a27f90c73d1c807%3A0xaa9cc71be2d5f17d!2sAkash%20Jewellers!5e0!3m2!1sen!2sin!4v1766856640425!5m2!1sen!2sin"
+                width="100%"
+                height="250"
+                style={{ border: 0 }}
+                allowFullScreen=""
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              ></iframe>
             </div>
           </div>
 

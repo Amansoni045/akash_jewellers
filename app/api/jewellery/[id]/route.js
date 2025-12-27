@@ -32,12 +32,17 @@ export async function PUT(req, { params }) {
 
     const body = await req.json();
 
+    const price = parseFloat(body.price);
+    if (isNaN(price)) {
+      return NextResponse.json({ error: "Invalid price" }, { status: 400 });
+    }
+
     const updatedItem = await prisma.jewellery.update({
       where: { id },
       data: {
         name: body.name,
         category: body.category,
-        price: parseFloat(body.price),
+        price: price,
         weight: body.weight ? parseFloat(body.weight) : null,
         image: body.image,
       },

@@ -23,6 +23,7 @@ model Jewellery {
   price     Float
   weight    Float?
   image     String?
+  images    String[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -33,6 +34,7 @@ model Contact {
   email     String
   phone     String?
   message   String
+  status    String    @default("pending")
   reply     String?
   repliedAt DateTime?
   createdAt DateTime  @default(now())

@@ -30,7 +30,7 @@ export default function Footer() {
           />
           <p className="text-gray-700 leading-relaxed">
             Handcrafted jewellery built with tradition, trust, and timeless
-            beauty.  
+            beauty.
             Discover elegance from the heart of Pali, Korba.
           </p>
         </div>
@@ -77,7 +77,17 @@ export default function Footer() {
 
             <div className="flex gap-3 items-start">
               <MapPin className="text-yellow-700 mt-1" />
-              <p>Pali, Korba — 495449, Chhattisgarh</p>
+              <div>
+                <p>Pali, Korba — 495449, Chhattisgarh</p>
+                <a
+                  href="https://maps.app.goo.gl/dHhVn6dDskssBvaW8"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-yellow-700 text-sm font-medium hover:underline block mt-1"
+                >
+                  View Location on Map →
+                </a>
+              </div>
             </div>
           </div>
         </div>

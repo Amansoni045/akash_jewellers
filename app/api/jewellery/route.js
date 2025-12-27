@@ -21,15 +21,29 @@ export async function GET(req) {
       name_desc: { name: "desc" }
     };
 
+    const minPrice = Number(searchParams.get("minPrice")) || 0;
+    const maxPrice = Number(searchParams.get("maxPrice")) || 10000000;
+    const minWeight = Number(searchParams.get("minWeight")) || 0;
+    const maxWeight = Number(searchParams.get("maxWeight")) || 1000;
+
     const where = {
       AND: [
+        {
+          price: { gte: minPrice, lte: maxPrice },
+        },
+        {
+          OR: [
+            { weight: { equals: null } },
+            { weight: { gte: minWeight, lte: maxWeight } }
+          ]
+        },
         search
           ? {
-              OR: [
-                { name: { contains: search, mode: "insensitive" } },
-                { category: { contains: search, mode: "insensitive" } },
-              ],
-            }
+            OR: [
+              { name: { contains: search, mode: "insensitive" } },
+              { category: { contains: search, mode: "insensitive" } },
+            ],
+          }
           : {},
 
         category ? { category: category.toLowerCase() } : {},
@@ -70,11 +84,20 @@ export async function POST(req) {
 
     const body = await req.json();
 
+    const price = parseFloat(body.price);
+
+    if (isNaN(price)) {
+      return NextResponse.json(
+        { error: "Invalid price" },
+        { status: 400 }
+      );
+    }
+
     const newItem = await prisma.jewellery.create({
       data: {
         name: body.name,
         category: body.category.toLowerCase(),
-        price: parseFloat(body.price),
+        price: price,
         weight: body.weight ? parseFloat(body.weight) : null,
         image: body.image,
       },

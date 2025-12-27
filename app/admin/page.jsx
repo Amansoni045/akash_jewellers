@@ -65,9 +65,15 @@ export default function AdminPage() {
 
     const token = localStorage.getItem("token");
 
+    const price = parseFloat(form.price);
+    if (isNaN(price)) {
+      alert("Please enter a valid price");
+      return;
+    }
+
     const payload = {
       ...form,
-      price: parseFloat(form.price),
+      price: price,
       weight: form.weight ? parseFloat(form.weight) : null,
     };
 

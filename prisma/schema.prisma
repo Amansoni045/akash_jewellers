@@ -39,3 +39,16 @@ model Contact {
   repliedAt DateTime?
   createdAt DateTime  @default(now())
 }
+
+model Price {
+  id        String   @id @default(uuid())
+  type      PriceType
+  rate      Float
+  createdAt DateTime @default(now())
+}
+
+enum PriceType {
+  GOLD
+  GOLD_RTGS
+  SILVER
+}

@@ -11,6 +11,14 @@ html[class~="dark"] {
   color: black !important;
 }
 
+.nav-btn {
+  @apply text-black font-medium hover:text-yellow-600;
+}
+
+.mobile-nav-btn {
+  @apply text-left font-medium;
+}
+
 
 @theme inline {
   --color-background: var(--background);

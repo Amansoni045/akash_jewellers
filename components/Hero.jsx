@@ -1,6 +1,7 @@
 "use client";
 import { ArrowDown, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 export default function Hero() {
   const scrollToCollection = () => {
@@ -22,9 +23,16 @@ export default function Hero() {
         initial={{ scale: 1.1 }}
         animate={{ scale: 1 }}
         transition={{ duration: 10, repeat: Infinity, repeatType: "reverse" }}
-        className="absolute inset-0 bg-cover bg-center brightness-[1.15]"
-        style={{ backgroundImage: "url('/heroImage.jpeg')" }}
-      />
+        className="absolute inset-0"
+      >
+        <Image
+          src="/heroImage.jpeg"
+          alt="Hero Background"
+          fill
+          priority
+          className="object-cover brightness-[1.15]"
+        />
+      </motion.div>
 
       <div className="absolute inset-0 bg-white/70 backdrop-blur-[2px]" />
       <div className="absolute inset-0 bg-gradient-to-b from-[#fff8e5]/50 to-[#f3dfb3]/60" />

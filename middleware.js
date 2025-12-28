@@ -13,7 +13,7 @@ export async function middleware(req) {
   const token = req.cookies.get("token")?.value;
 
   if (!token) {
-    return NextResponse.json({ error: "No token found in cookies" }, { status: 401 });
+    return NextResponse.redirect(new URL("/login", req.url));
   }
 
   try {
@@ -28,13 +28,8 @@ export async function middleware(req) {
 
     return NextResponse.next();
   } catch (err) {
-    console.error("Middleware Error:", err);
-    return NextResponse.json({
-      error: "Middleware Verification Failed",
-      details: err.message,
-      check: "Check console logs",
-      envSecretExists: !!JWT_SECRET
-    }, { status: 401 });
+    console.error("Middleware Auth Error:", err);
+    return NextResponse.redirect(new URL("/login", req.url));
   }
 }
 

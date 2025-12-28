@@ -14,7 +14,7 @@ export const metadata = {
     siteName: "Akash Jewellers",
     images: [
       {
-        url: "/og-image.jpg", 
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
       },
@@ -26,10 +26,10 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className="bg-white !bg-white" suppressHydrationWarning>
-      <body className="min-h-screen w-full overflow-x-hidden bg-white text-black !bg-white !text-black">
+    <html lang="en" className="bg-white" suppressHydrationWarning>
+      <body className="min-h-screen w-full overflow-x-hidden bg-white text-black">
         <Navbar />
-        <main className="w-full min-h-screen bg-white text-black !bg-white !text-black">
+        <main className="w-full min-h-screen bg-white text-black">
           {children}
         </main>
         <FloatingWhatsApp />

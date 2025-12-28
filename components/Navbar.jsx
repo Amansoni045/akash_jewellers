@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Menu, X, User } from "lucide-react";
 import LivePrices from "./LivePrices";
 import { usePathname, useRouter } from "next/navigation";
+import { getToken } from "@/lib/getToken";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -24,10 +25,12 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     if (!token) return;
 
-    fetch("/api/me", { headers: { Authorization: `Bearer ${token}` } })
+    fetch("/api/me", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
       .then((res) => res.json())
       .then((data) => {
         if (data?.user) {
@@ -35,8 +38,12 @@ export default function Navbar() {
           setIsLoggedIn(true);
         }
       })
-      .catch(() => setIsLoggedIn(false));
+      .catch(() => {
+        setUser(null);
+        setIsLoggedIn(false);
+      });
   }, []);
+
 
   useEffect(() => {
     const close = (e) => {
@@ -47,11 +54,13 @@ export default function Navbar() {
   }, []);
 
   const logout = () => {
+    document.cookie = "token=; path=/; max-age=0";
     localStorage.removeItem("token");
     setUser(null);
     setIsLoggedIn(false);
     router.push("/login");
   };
+
 
   const goToSection = (id) => {
     if (window.location.pathname !== "/") {

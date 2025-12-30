@@ -96,7 +96,7 @@ export async function POST(req) {
     const newItem = await prisma.jewellery.create({
       data: {
         name: body.name,
-        category: body.category.toLowerCase(),
+        category: (body.category || "").toLowerCase(),
         price: price,
         weight: body.weight ? parseFloat(body.weight) : null,
         image: body.image,

@@ -41,7 +41,7 @@ export async function PUT(req, { params }) {
       where: { id },
       data: {
         name: body.name,
-        category: body.category,
+        category: (body.category || "").toLowerCase(),
         price: price,
         weight: body.weight ? parseFloat(body.weight) : null,
         image: body.image,

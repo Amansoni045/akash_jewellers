@@ -40,15 +40,11 @@ model Contact {
   createdAt DateTime  @default(now())
 }
 
-model Price {
+model LivePrice {
   id        String   @id @default(uuid())
-  type      PriceType
-  rate      Float
+  gold      Float
+  goldRTGS  Float
+  silver    Float
   createdAt DateTime @default(now())
-}
-
-enum PriceType {
-  GOLD
-  GOLD_RTGS
-  SILVER
+  updatedAt DateTime @updatedAt
 }

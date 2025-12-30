@@ -19,6 +19,19 @@ html[class~="dark"] {
   @apply text-left font-medium;
 }
 
+.input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 14px;
+  outline: none;
+}
+
+.input:focus {
+  border-color: #facc15;
+  box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.4);
+}
 
 @theme inline {
   --color-background: var(--background);

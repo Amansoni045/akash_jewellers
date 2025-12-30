@@ -126,9 +126,6 @@ export default function Navbar() {
 
               {user?.role === "admin" && (
                 <>
-                  <Link href="/admin/messages" className="nav-btn">
-                    Messages
-                  </Link>
                   <Link href="/admin" className="nav-btn">
                     Admin Panel
                   </Link>

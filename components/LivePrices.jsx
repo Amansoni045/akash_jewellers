@@ -52,6 +52,7 @@ function Indicator({ delta, percent }) {
 export default function LivePrices() {
   const [prices, setPrices] = useState(null);
   const [diffs, setDiffs] = useState(null);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     fetch("/api/livePrices")
@@ -91,6 +92,16 @@ export default function LivePrices() {
       });
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest(".live-prices-container")) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
   if (!prices) return null;
 
   const date = new Date(prices.updatedAt).toLocaleDateString("en-IN", {
@@ -106,13 +117,17 @@ export default function LivePrices() {
   });
 
   return (
-    <div className="relative group z-50">
-      <button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-yellow-600 to-yellow-500 text-white rounded-full shadow-md">
+    <div className="relative z-50 live-prices-container">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-yellow-600 to-yellow-500 text-white rounded-full shadow-md"
+      >
         <TrendingUp className="w-4 h-4" />
-        <span className="hidden md:inline font-medium">Live Rates</span>
+        <span className="font-medium">Live Rates</span>
       </button>
 
-      <div className="absolute right-0 mt-3 w-80 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition">
+      <div className={`absolute right-0 mt-3 w-[calc(100vw-2rem)] md:w-80 max-w-[320px] transition-all duration-300 ${isOpen ? "opacity-100 pointer-events-auto transform-none" : "opacity-0 pointer-events-none -translate-y-2 md:group-hover:opacity-100 md:group-hover:pointer-events-auto md:group-hover:translate-y-0"
+        }`}>
         <div className="bg-white rounded-2xl shadow-xl border px-5 py-4 text-sm space-y-5">
 
           <div className="grid grid-cols-[1fr_auto] gap-4 items-start">

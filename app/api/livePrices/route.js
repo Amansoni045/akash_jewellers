@@ -4,8 +4,39 @@ import { verifyToken } from "@/lib/auth";
 
 export async function GET() {
   try {
-    const price = await prisma.livePrice.findFirst();
-    return NextResponse.json(price || {});
+    const rows = await prisma.livePrice.findMany({
+      orderBy: { updatedAt: "desc" },
+      take: 2,
+    });
+
+    if (!rows || rows.length === 0) {
+      return NextResponse.json(null);
+    }
+
+    const current = rows[0];
+    const previous = rows[1];
+
+    const calc = (curr, prev) => {
+      if (prev == null) return null;
+      return {
+        delta: curr - prev,
+        percent: ((curr - prev) / prev) * 100,
+      };
+    };
+
+    return NextResponse.json({
+      prices: {
+        gold: current.gold,
+        goldRTGS: current.goldRTGS,
+        silver: current.silver,
+      },
+      diffs: {
+        gold: calc(current.gold, previous?.gold),
+        goldRTGS: calc(current.goldRTGS, previous?.goldRTGS),
+        silver: calc(current.silver, previous?.silver),
+      },
+      updatedAt: current.updatedAt,
+    });
   } catch (err) {
     console.error("LivePrices GET Error:", err);
     return NextResponse.json(
@@ -29,31 +60,22 @@ export async function POST(req) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const { gold, goldRTGS, silver } = await req.json();
+    const body = await req.json();
+    const { gold, goldRTGS, silver } = body;
 
     if (
       typeof gold !== "number" ||
       typeof goldRTGS !== "number" ||
       typeof silver !== "number"
     ) {
-      return NextResponse.json(
-        { error: "Invalid prices" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid data" }, { status: 400 });
     }
 
-    const updated = await prisma.livePrice.upsert({
-      where: { id: "singleton" },
-      update: { gold, goldRTGS, silver },
-      create: {
-        id: "singleton",
-        gold,
-        goldRTGS,
-        silver,
-      },
+    const created = await prisma.livePrice.create({
+      data: { gold, goldRTGS, silver },
     });
 
-    return NextResponse.json(updated);
+    return NextResponse.json(created);
   } catch (err) {
     console.error("LivePrices POST Error:", err);
     return NextResponse.json(

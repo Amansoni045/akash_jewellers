@@ -97,3 +97,36 @@ export async function GET(req) {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
+export async function DELETE(req) {
+  try {
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const token = authHeader.split(" ")[1];
+    const decoded = verifyToken(token);
+    if (!decoded) {
+      return NextResponse.json({ error: "Invalid token" }, { status: 403 });
+    }
+
+    const admin = await prisma.user.findUnique({ where: { id: decoded.id } });
+    if (admin?.role !== "admin") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json({ error: "Message ID required" }, { status: 400 });
+    }
+
+    await prisma.contact.delete({ where: { id } });
+
+    return NextResponse.json({ message: "Deleted successfully" });
+  } catch (err) {
+    console.error("CONTACT DELETE ERROR:", err);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
+}

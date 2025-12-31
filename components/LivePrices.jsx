@@ -9,13 +9,14 @@ function formatDelta(value) {
 }
 
 function formatPercent(p) {
-  if (!isFinite(p)) return "0%";
+  if (!Number.isFinite(p)) return "0%";
   return `${p > 0 ? "+" : ""}${p.toFixed(2)}%`;
 }
 
 function Indicator({ delta, percent }) {
-  if (delta == null)
+  if (delta == null) {
     return <span className="text-xs text-gray-500">—</span>;
+  }
 
   if (delta > 0) {
     return (
@@ -50,46 +51,18 @@ function Indicator({ delta, percent }) {
 }
 
 export default function LivePrices() {
-  const [prices, setPrices] = useState(null);
-  const [diffs, setDiffs] = useState(null);
+  const [data, setData] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     fetch("/api/livePrices")
-      .then(r => r.json())
-      .then(data => {
-        const lastPrices = JSON.parse(localStorage.getItem("lastPrices") || "null");
-        const lastDiffs = JSON.parse(localStorage.getItem("lastDiffs") || "null");
-
-        let currentDiffs = lastDiffs;
-
-        // If we have stored prices and the server data is newer/different
-        if (lastPrices && lastPrices.updatedAt !== data.updatedAt) {
-          currentDiffs = {
-            silver: {
-              delta: data.silver - lastPrices.silver,
-              pct: ((data.silver - lastPrices.silver) / lastPrices.silver) * 100,
-            },
-            gold: {
-              delta: data.gold - lastPrices.gold,
-              pct: ((data.gold - lastPrices.gold) / lastPrices.gold) * 100,
-            },
-            goldRTGS: {
-              delta: data.goldRTGS - lastPrices.goldRTGS,
-              pct: ((data.goldRTGS - lastPrices.goldRTGS) / lastPrices.goldRTGS) * 100,
-            },
-          };
-
-          localStorage.setItem("lastDiffs", JSON.stringify(currentDiffs));
-          localStorage.setItem("lastPrices", JSON.stringify(data));
-        } else if (!lastPrices) {
-          // First visit, just store current prices
-          localStorage.setItem("lastPrices", JSON.stringify(data));
+      .then((r) => r.json())
+      .then((res) => {
+        if (res) {
+          setData(res);
         }
-
-        setDiffs(currentDiffs);
-        setPrices(data);
-      });
+      })
+      .catch((err) => console.error("Failed to fetch live prices:", err));
   }, []);
 
   useEffect(() => {
@@ -102,15 +75,17 @@ export default function LivePrices() {
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
-  if (!prices) return null;
+  if (!data?.prices) return null;
 
-  const date = new Date(prices.updatedAt).toLocaleDateString("en-IN", {
+  const { prices, diffs, updatedAt } = data;
+
+  const date = new Date(updatedAt).toLocaleDateString("en-IN", {
     day: "2-digit",
     month: "short",
     year: "numeric",
   });
 
-  const time = new Date(prices.updatedAt).toLocaleTimeString("en-IN", {
+  const time = new Date(updatedAt).toLocaleTimeString("en-IN", {
     hour: "2-digit",
     minute: "2-digit",
     hour12: true,
@@ -120,77 +95,82 @@ export default function LivePrices() {
     <div className="relative z-50 live-prices-container">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-yellow-600 to-yellow-500 text-white rounded-full shadow-md"
+        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-yellow-600 to-yellow-500 text-white rounded-full shadow-md hover:from-yellow-500 hover:to-yellow-600 transition-all"
       >
         <TrendingUp className="w-4 h-4" />
         <span className="font-medium">Live Rates</span>
       </button>
 
-      <div className={`absolute right-0 mt-3 w-[calc(100vw-2rem)] md:w-80 max-w-[320px] transition-all duration-300 ${isOpen ? "opacity-100 pointer-events-auto transform-none" : "opacity-0 pointer-events-none -translate-y-2 md:group-hover:opacity-100 md:group-hover:pointer-events-auto md:group-hover:translate-y-0"
-        }`}>
-        <div className="bg-white rounded-2xl shadow-xl border px-5 py-4 text-sm space-y-5">
+      <div
+        className={`absolute right-0 mt-3 w-[calc(100vw-2rem)] md:w-80 max-w-[320px] transition-all duration-300 transform origin-top-right ${isOpen
+          ? "opacity-100 scale-100 pointer-events-auto"
+          : "opacity-0 scale-95 pointer-events-none"
+          }`}
+      >
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 px-5 py-6 text-sm space-y-5">
 
-          <div className="grid grid-cols-[1fr_auto] gap-4 items-start">
+          <div className="grid grid-cols-[1fr_auto] gap-4 items-center">
             <div>
-              <p className="font-medium">Silver (1 kg)</p>
-              <span className="text-xs text-gray-500">Market rate</span>
+              <p className="font-bold text-gray-800 text-base">Silver (1 kg)</p>
+              <span className="text-xs text-gray-500 font-medium">Market rate</span>
             </div>
             <div className="text-right space-y-1">
-              <p className="font-semibold">
-                ₹{prices.silver.toLocaleString("en-IN")}
+              <p className="font-bold text-lg text-gray-900">
+                ₹{prices.silver?.toLocaleString("en-IN") ?? "—"}
               </p>
-              <Indicator {...diffs?.silver} />
+              <Indicator {...(diffs?.silver ?? { delta: 0, percent: 0 })} />
             </div>
           </div>
 
-          <div className="grid grid-cols-[1fr_auto] gap-4 items-start">
+          <div className="h-px bg-gray-100" />
+
+          <div className="grid grid-cols-[1fr_auto] gap-4 items-center">
             <div>
-              <p className="font-medium">Gold (10 g)</p>
-              <span className="text-xs text-gray-500">Standard rate</span>
+              <p className="font-bold text-gray-800 text-base">Gold (10 g)</p>
+              <span className="text-xs text-gray-500 font-medium">Standard rate</span>
             </div>
             <div className="text-right space-y-1">
-              <p className="font-semibold">
-                ₹{prices.gold.toLocaleString("en-IN")}
+              <p className="font-bold text-lg text-gray-900">
+                ₹{prices.gold?.toLocaleString("en-IN") ?? "—"}
               </p>
-              <Indicator {...diffs?.gold} />
+              <Indicator {...(diffs?.gold ?? { delta: 0, percent: 0 })} />
             </div>
           </div>
 
-          <div className="grid grid-cols-[1fr_auto] gap-4 items-start text-xs">
+          <div className="h-px bg-gray-100" />
+
+          <div className="grid grid-cols-[1fr_auto] gap-4 items-center">
             <div>
-              <p className="font-medium">Gold (RTGS)</p>
-              <span className="text-gray-500">Bulk / RTGS</span>
+              <p className="font-bold text-gray-800 text-base">Gold (RTGS)</p>
+              <span className="text-xs text-gray-500 font-medium">Bulk / RTGS</span>
             </div>
             <div className="text-right space-y-1">
-              <p className="font-medium">
-                ₹{prices.goldRTGS.toLocaleString("en-IN")}
+              <p className="font-bold text-lg text-gray-900">
+                ₹{prices.goldRTGS?.toLocaleString("en-IN") ?? "—"}
               </p>
-              <Indicator {...diffs?.goldRTGS} />
+              <Indicator {...(diffs?.goldRTGS ?? { delta: 0, percent: 0 })} />
             </div>
           </div>
 
-          <div className="h-px bg-gray-200" />
+          <div className="h-px bg-gray-100" />
 
-          <div className="text-xs text-gray-500 space-y-2">
-            <p>
-              Updated on <b>{date}</b> at <b>{time}</b>
-            </p>
+          <div className="space-y-3 pt-1">
+            <div className="flex justify-between items-center text-xs text-gray-500">
+              <span>updated: {date}, {time}</span>
+            </div>
 
-            <div className="flex flex-wrap gap-x-4 gap-y-1">
-              <span className="flex items-center gap-1 text-green-700">
-                <ArrowUp className="w-3 h-3" /> Increased
+            <div className="flex flex-wrap gap-3 text-[10px] uppercase font-bold tracking-wider text-gray-400">
+              <span className="flex items-center gap-1">
+                <ArrowUp className="w-3 h-3 text-green-600" /> Increase
               </span>
-              <span className="flex items-center gap-1 text-red-700">
-                <ArrowDown className="w-3 h-3" /> Decreased
-              </span>
-              <span className="flex items-center gap-1 text-gray-600">
-                <Minus className="w-3 h-3" /> No change
+              <span className="flex items-center gap-1">
+                <ArrowDown className="w-3 h-3 text-red-600" /> Decrease
               </span>
             </div>
           </div>
 
-          <p className="text-xs text-gray-400 text-center">
-            Rates are indicative.
+          <p className="text-[10px] text-gray-400 text-center font-medium">
+            * Rates are indicative and subject to change.
           </p>
         </div>
       </div>

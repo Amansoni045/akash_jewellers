@@ -135,11 +135,11 @@ export default function CategoryPage() {
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="bg-white rounded-xl h-80 animate-pulse shadow-sm">
-                <div className="h-56 bg-gray-200 rounded-t-xl" />
-                <div className="p-4 space-y-3">
+              <div key={i} className="bg-white rounded-xl h-64 md:h-80 animate-pulse shadow-sm">
+                <div className="h-40 md:h-56 bg-gray-200 rounded-t-xl" />
+                <div className="p-3 md:p-4 space-y-3">
                   <div className="h-4 bg-gray-200 rounded w-3/4" />
                   <div className="h-4 bg-gray-200 rounded w-1/2" />
                 </div>
@@ -161,7 +161,7 @@ export default function CategoryPage() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
             <AnimatePresence>
               {items.map((item) => (
                 <motion.div
@@ -170,10 +170,10 @@ export default function CategoryPage() {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
                   whileHover={{ y: -5 }}
-                  className="group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden cursor-pointer"
+                  className="group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden cursor-pointer flex flex-col"
                   onClick={() => router.push(`/catalogue/item/${item.id}`)}
                 >
-                  <div className="relative h-64 overflow-hidden bg-gray-50">
+                  <div className="relative h-40 md:h-64 overflow-hidden bg-gray-50 flex-shrink-0">
                     <img
                       src={item.image || "/placeholder.png"}
                       alt={item.name}
@@ -182,19 +182,19 @@ export default function CategoryPage() {
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
                   </div>
 
-                  <div className="p-5">
-                    <p className="text-xs text-yellow-600 font-medium uppercase tracking-wider mb-1">
+                  <div className="p-3 md:p-5 flex flex-col flex-1">
+                    <p className="text-[10px] md:text-xs text-yellow-600 font-medium uppercase tracking-wider mb-1">
                       {item.category}
                     </p>
-                    <h3 className="font-playfair font-semibold text-lg text-gray-900 line-clamp-1 group-hover:text-yellow-700 transition-colors">
+                    <h3 className="font-playfair font-semibold text-sm md:text-lg text-gray-900 line-clamp-2 md:line-clamp-1 group-hover:text-yellow-700 transition-colors mb-auto">
                       {item.name}
                     </h3>
 
                     <div className="flex items-center justify-between mt-3">
-                      <p className="text-xl font-bold text-gray-900">
+                      <p className="text-base md:text-xl font-bold text-gray-900">
                         ₹{item.price.toLocaleString()}
                       </p>
-                      <div className="p-2 bg-yellow-50 rounded-full text-yellow-600 opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all">
+                      <div className="hidden md:block p-2 bg-yellow-50 rounded-full text-yellow-600 opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all">
                         <ArrowRight size={18} />
                       </div>
                     </div>

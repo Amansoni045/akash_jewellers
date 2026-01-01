@@ -10,8 +10,11 @@ export default function JewelleryPage() {
   const [form, setForm] = useState({
     name: "",
     category: "",
-    price: "",
     weight: "",
+    makingCharges: "",
+    gst: "3",
+    discount: "0",
+    description: "",
     image: "",
   });
   const [editId, setEditId] = useState(null);
@@ -30,26 +33,35 @@ export default function JewelleryPage() {
 
   const submit = async e => {
     e.preventDefault();
-    const token = getToken();
-    const payload = {
-      ...form,
-      price: Number(form.price),
-      weight: form.weight ? Number(form.weight) : null,
-    };
+    try {
+      const token = getToken();
+      const payload = {
+        ...form,
+        weight: Number(form.weight),
+        makingCharges: Number(form.makingCharges),
+        gst: Number(form.gst),
+        discount: Number(form.discount),
+        description: form.description,
+        price: 0, // Ignored or legacy
+      };
 
-    if (editId) {
-      await api.put(`/jewellery/${editId}`, payload, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-    } else {
-      await api.post("/jewellery", payload, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      if (editId) {
+        await api.put(`/jewellery/${editId}`, payload, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      } else {
+        await api.post("/jewellery", payload, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      }
+
+      setForm({ name: "", category: "", weight: "", makingCharges: "", gst: "3", discount: "0", description: "", image: "" });
+      setEditId(null);
+      load();
+    } catch (error) {
+      console.error(error);
+      alert(error.response?.data?.error || "An error occurred");
     }
-
-    setForm({ name: "", category: "", price: "", weight: "", image: "" });
-    setEditId(null);
-    load();
   };
 
   const del = async id => {
@@ -77,6 +89,7 @@ export default function JewelleryPage() {
           <div>
             <label className="block text-sm font-medium mb-1">Name</label>
             <input
+              required
               value={form.name}
               onChange={e => setForm({ ...form, name: e.target.value })}
               className="w-full rounded-lg border px-4 py-3 text-sm focus:ring-2 focus:ring-yellow-400 outline-none"
@@ -87,6 +100,7 @@ export default function JewelleryPage() {
           <div>
             <label className="block text-sm font-medium mb-1">Category</label>
             <select
+              required
               value={form.category}
               onChange={e => setForm({ ...form, category: e.target.value })}
               className="w-full rounded-lg border px-4 py-3 text-sm bg-white focus:ring-2 focus:ring-yellow-400 outline-none"
@@ -100,22 +114,60 @@ export default function JewelleryPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Price (₹)</label>
+            <label className="block text-sm font-medium mb-1">Weight (grams)</label>
             <input
-              value={form.price}
-              onChange={e => setForm({ ...form, price: e.target.value })}
+              required
+              type="number"
+              step="0.01"
+              value={form.weight}
+              onChange={e => setForm({ ...form, weight: e.target.value })}
               className="w-full rounded-lg border px-4 py-3 text-sm focus:ring-2 focus:ring-yellow-400 outline-none"
-              placeholder="Price"
+              placeholder="e.g. 10.5"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Weight (gm)</label>
+            <label className="block text-sm font-medium mb-1">Making Charges (₹)</label>
             <input
-              value={form.weight}
-              onChange={e => setForm({ ...form, weight: e.target.value })}
+              type="number"
+              value={form.makingCharges}
+              onChange={e => setForm({ ...form, makingCharges: e.target.value })}
               className="w-full rounded-lg border px-4 py-3 text-sm focus:ring-2 focus:ring-yellow-400 outline-none"
-              placeholder="Optional"
+              placeholder="e.g. 5000"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">GST (%)</label>
+            <input
+              type="number"
+              step="0.1"
+              value={form.gst}
+              onChange={e => setForm({ ...form, gst: e.target.value })}
+              className="w-full rounded-lg border px-4 py-3 text-sm focus:ring-2 focus:ring-yellow-400 outline-none"
+              placeholder="e.g. 3"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Discount (₹)</label>
+            <input
+              type="number"
+              value={form.discount}
+              onChange={e => setForm({ ...form, discount: e.target.value })}
+              className="w-full rounded-lg border px-4 py-3 text-sm focus:ring-2 focus:ring-yellow-400 outline-none"
+              placeholder="Optional discount amount"
+            />
+          </div>
+
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium mb-1">Description</label>
+            <textarea
+              rows="3"
+              value={form.description}
+              onChange={e => setForm({ ...form, description: e.target.value })}
+              className="w-full rounded-lg border px-4 py-3 text-sm focus:ring-2 focus:ring-yellow-400 outline-none resize-none"
+              placeholder="Product description..."
             />
           </div>
 
@@ -150,18 +202,30 @@ export default function JewelleryPage() {
               />
             </div>
 
-            <div className="p-4 space-y-1">
+            <div className="p-4 space-y-2">
               <h3 className="font-semibold">{i.name}</h3>
               <p className="text-xs text-gray-500 capitalize">{i.category}</p>
-              <p className="font-bold text-lg mt-1">₹ {i.price}</p>
 
-              <div className="flex gap-3 mt-4">
+              <div className="grid grid-cols-2 text-xs text-gray-600 gap-y-1">
+                <span>Weight:</span> <span className="font-medium">{i.weight}g</span>
+                <span>Making:</span> <span className="font-medium">₹{i.makingCharges}</span>
+                <span>GST:</span> <span className="font-medium">{i.gst}%</span>
+                {i.discount > 0 && (
+                  <><span>Discount:</span> <span className="font-medium text-green-600">-₹{i.discount}</span></>
+                )}
+              </div>
+
+              <div className="flex gap-3 mt-4 pt-4 border-t">
                 <button
                   onClick={() => {
                     setEditId(i.id);
                     setForm({
                       ...i,
                       weight: i.weight || "",
+                      makingCharges: i.makingCharges || "",
+                      gst: i.gst || "3",
+                      discount: i.discount || "0",
+                      description: i.description || "",
                       image: i.image || "",
                     });
                   }}

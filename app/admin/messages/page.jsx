@@ -7,7 +7,7 @@ import { Trash2, Mail, MessageCircle, X, Send } from "lucide-react";
 export default function MessagesPage() {
   const [msgs, setMsgs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("inbox"); // 'inbox' or 'replied'
+  const [activeTab, setActiveTab] = useState("inbox"); 
 
   useEffect(() => {
     const token = getToken();
@@ -37,6 +37,10 @@ export default function MessagesPage() {
     if (!replySubject || !replyBody) return alert("Please fill all fields");
 
     setSendingReply(true);
+
+    const mailtoLink = `mailto:${selectedMessage.email}?subject=${encodeURIComponent(replySubject)}&body=${encodeURIComponent(replyBody)}`;
+    window.open(mailtoLink, '_blank');
+
     try {
       const token = getToken();
       const res = await fetch("/api/contact/reply", {
@@ -46,7 +50,7 @@ export default function MessagesPage() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          id: selectedMessage.id, // Add ID
+          id: selectedMessage.id, 
           email: selectedMessage.email,
           name: selectedMessage.name,
           subject: replySubject,
@@ -57,21 +61,20 @@ export default function MessagesPage() {
       const data = await res.json();
 
       if (res.ok) {
-        alert(data.warning || "Reply sent successfully!");
+        alert("Email client opened! Message marked as replied.");
         setReplyModalOpen(false);
         setReplyBody("");
-        // Move to Replied tab locally
         setMsgs((prev) =>
           prev.map((m) =>
             m.id === selectedMessage.id ? { ...m, status: "replied", reply: replyBody, repliedAt: new Date() } : m
           )
         );
       } else {
-        alert(data.error || "Failed to send reply");
+        alert(data.error || "Failed to mark as replied");
       }
     } catch (err) {
       console.error(err);
-      alert("Error sending reply");
+      alert("Error marking reply");
     } finally {
       setSendingReply(false);
     }
@@ -105,7 +108,6 @@ export default function MessagesPage() {
     <div className="max-w-6xl mx-auto px-6 py-10">
       <h1 className="text-3xl font-semibold mb-6">Customer Messages</h1>
 
-      {/* Tabs */}
       <div className="flex gap-4 mb-8 border-b">
         <button
           onClick={() => setActiveTab("inbox")}

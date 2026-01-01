@@ -14,28 +14,32 @@ export default function ProductDetails() {
   const [similarItems, setSimilarItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState("");
+  const [livePrices, setLivePrices] = useState(null);
 
   useEffect(() => {
-    const load = async () => {
-      try {
-        setLoading(true);
-        const res = await api.get(`/jewellery?id=${id}`);
-        const currentItem = res.data.data?.[0];
+    // Fetch Live Prices alongside item data
+    const fetchPrices = fetch("/api/livePrices").then(r => r.json());
 
-        if (currentItem) {
-          setItem(currentItem);
-          setSelectedImage(currentItem.image || "/placeholder.png");
+    // Fetch Item
+    const fetchItem = api.get(`/jewellery?id=${id}`);
 
-          const similarRes = await api.get(`/jewellery?category=${currentItem.category}&limit=4`);
-          setSimilarItems(similarRes.data.data.filter(i => i.id !== currentItem.id).slice(0, 3));
-        }
-        setLoading(false);
-      } catch (err) {
-        console.error(err);
-        setLoading(false);
+    Promise.all([fetchPrices, fetchItem]).then(([pricesData, itemRes]) => {
+      setLivePrices(pricesData);
+
+      const currentItem = itemRes.data.data?.[0];
+      if (currentItem) {
+        setItem(currentItem);
+        setSelectedImage(currentItem.image || "/placeholder.png");
+
+        // Fetch Similar
+        api.get(`/jewellery?category=${currentItem.category}&limit=4`)
+          .then(res => setSimilarItems(res.data.data.filter(i => i.id !== currentItem.id).slice(0, 3)));
       }
-    };
-    load();
+      setLoading(false);
+    }).catch(err => {
+      console.error(err);
+      setLoading(false);
+    });
   }, [id]);
 
   if (loading) return (
@@ -53,9 +57,77 @@ export default function ProductDetails() {
     </div>
   );
 
+  // Dynamic Price Calculation
+  // Formula: (Rate * Weight) + Making + GST
+  // Final = Original - Discount
+
+  let rate = 0;
+  if (item.name.toLowerCase().includes("silver")) {
+    rate = livePrices?.prices?.silver || 0;
+  } else {
+    rate = livePrices?.prices?.gold || 0;
+  }
+
+  if (item.category === 'silver') rate = livePrices?.prices?.silver || 0;
+
+  let ratePerGram = 0;
+  if (livePrices?.prices) {
+    if (item.category === 'silver' || item.name.toLowerCase().includes('silver')) {
+      ratePerGram = livePrices.prices.silver / 1000;
+    } else {
+      ratePerGram = livePrices.prices.gold / 10;
+    }
+  }
+
+  const basePrice = ratePerGram * item.weight;
+  const makingCharges = item.makingCharges || 0;
+  const gst = item.gst !== undefined ? item.gst : 3;
+
+  let gross = 0, originalPrice = 0, finalPrice = 0, discount = 0;
+  let suffix = "";
+  // Scenarios:
+  // 1. Making>0, GST>0: Full
+  // 2. Making=0, GST>0: +Making
+  // 3. Making>0, GST=0: +GST
+  // 4. Making=0, GST=0: +Making+GST
+
+  if (makingCharges === 0 && gst === 0) {
+    // Scenario 4
+    suffix = "+ Making Charges + GST";
+    originalPrice = Math.round(basePrice);
+    finalPrice = Math.round(basePrice);
+    discount = 0;
+  } else if (makingCharges === 0 && gst > 0) {
+    // Scenario 2
+    suffix = "+ Making Charges";
+    const tax = basePrice * (gst / 100);
+    const total = basePrice + tax;
+    originalPrice = Math.round(total);
+    finalPrice = Math.round(total);
+    discount = 0;
+  } else if (makingCharges > 0 && gst === 0) {
+    // Scenario 3
+    suffix = "+ GST";
+    const total = basePrice + makingCharges;
+    originalPrice = Math.round(total);
+    finalPrice = Math.round(total);
+    discount = item.discount || 0;
+    finalPrice = Math.max(0, finalPrice - discount);
+  } else {
+    // Scenario 1: Full
+    suffix = "";
+    gross = basePrice + makingCharges;
+    const gstAmount = gross * (gst / 100);
+    originalPrice = Math.round(gross + gstAmount);
+    discount = item.discount || 0;
+    finalPrice = Math.max(0, originalPrice - discount);
+  }
+
+
   const whatsappMessage = `Hi, I am interested in this product:
 Name: ${item.name}
-Price: ₹${item.price}
+ID: ${item.id}
+Price: ₹${finalPrice.toLocaleString()} ${suffix}
 Link: ${typeof window !== "undefined" ? window.location.href : ""}
 `;
 
@@ -84,6 +156,11 @@ Link: ${typeof window !== "undefined" ? window.location.href : ""}
               <div className="absolute top-3 left-3 md:top-4 md:left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] md:text-xs font-bold text-gray-900 shadow-sm uppercase tracking-wide">
                 {item.category}
               </div>
+              {discount > 0 && suffix === "" && (
+                <div className="absolute top-3 right-3 md:top-4 md:right-4 bg-red-500 text-white px-3 py-1 rounded-full text-[10px] md:text-xs font-bold shadow-sm uppercase tracking-wide">
+                  Discount Offer
+                </div>
+              )}
             </div>
 
             <div className="flex gap-3 md:gap-4 overflow-x-auto pb-2 scrollbar-none">
@@ -108,9 +185,32 @@ Link: ${typeof window !== "undefined" ? window.location.href : ""}
               <span className="text-gray-500 text-xs md:text-sm">ID: {item.id.slice(0, 8)}</span>
             </div>
 
-            <p className="text-3xl md:text-4xl font-bold text-yellow-600 mb-6 md:mb-8">
-              ₹ {item.price.toLocaleString()}
-            </p>
+            <div className="mb-6 md:mb-8">
+              {suffix !== "" ? (
+                <div className="flex flex-col">
+                  <p className="text-3xl md:text-4xl font-bold text-yellow-600">
+                    ₹ {finalPrice.toLocaleString()}
+                  </p>
+                  <p className="text-sm text-gray-500 font-medium mt-1">
+                    {suffix}
+                  </p>
+                </div>
+              ) : discount > 0 ? (
+                <div className="flex items-baseline gap-3">
+                  <span className="text-3xl md:text-4xl font-bold text-yellow-600">
+                    ₹ {finalPrice.toLocaleString()}
+                  </span>
+                  <span className="text-xl md:text-2xl text-gray-400 line-through decoration-red-500">
+                    ₹ {originalPrice.toLocaleString()}
+                  </span>
+                </div>
+              ) : (
+                <p className="text-3xl md:text-4xl font-bold text-yellow-600">
+                  ₹ {finalPrice.toLocaleString()}
+                </p>
+              )}
+              {suffix === "" && <p className="text-xs text-gray-400 mt-1">*Price includes GST and Making Charges</p>}
+            </div>
 
             <div className="space-y-4 mb-8 text-gray-600 text-sm md:text-base">
               <p>Explore the elegance of this handcrafted piece. Perfect for occasions that matter.</p>
@@ -124,8 +224,29 @@ Link: ${typeof window !== "undefined" ? window.location.href : ""}
                   <span className="block text-xs text-gray-500 mb-1">Purity</span>
                   <span className="font-semibold text-gray-900 text-sm md:text-base">22K / 24K Gold</span>
                 </div>
+                <div className="p-3 md:p-4 bg-gray-50 rounded-xl">
+                  <span className="block text-xs text-gray-500 mb-1">Making Charges</span>
+                  <span className="font-semibold text-gray-900 text-sm md:text-base">
+                    {makingCharges === 0 ? "Excluded" : `₹${item.makingCharges}`}
+                  </span>
+                </div>
+                <div className="p-3 md:p-4 bg-gray-50 rounded-xl">
+                  <span className="block text-xs text-gray-500 mb-1">GST</span>
+                  <span className="font-semibold text-gray-900 text-sm md:text-base">
+                    {gst === 0 ? "Excluded" : `${item.gst}%`}
+                  </span>
+                </div>
               </div>
             </div>
+
+            {item.description && (
+              <div className="mb-8">
+                <h3 className="font-playfair font-bold text-lg text-gray-900 mb-2">Description</h3>
+                <p className="text-gray-600 text-sm md:text-base leading-relaxed whitespace-pre-wrap">
+                  {item.description}
+                </p>
+              </div>
+            )}
 
             <div className="hidden md:flex gap-4">
               <a
@@ -139,7 +260,7 @@ Link: ${typeof window !== "undefined" ? window.location.href : ""}
             </div>
 
             <p className="hidden md:block text-xs text-gray-400 mt-4 text-center">
-              * Prices may vary based on live gold rates. Contact us for final pricing.
+              * Prices vary based on live gold rates.
             </p>
           </div>
         </div>
@@ -158,7 +279,8 @@ Link: ${typeof window !== "undefined" ? window.location.href : ""}
                     <img src={sim.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                   </div>
                   <h4 className="font-semibold text-sm md:text-base text-gray-900 group-hover:text-yellow-600 line-clamp-1">{sim.name}</h4>
-                  <p className="text-yellow-600 font-bold text-sm md:text-base">₹{sim.price.toLocaleString()}</p>
+                  {/* Note: Dynamic pricing for grid items would require similar logic component or prop passing. For now, showing stored price or N/A or refactoring card */}
+                  <p className="text-yellow-600 font-bold text-sm md:text-base">View Price</p>
                 </div>
               ))}
             </div>
@@ -170,8 +292,8 @@ Link: ${typeof window !== "undefined" ? window.location.href : ""}
       {/* Sticky Mobile Footer */}
       <div className="fixed md:hidden bottom-0 left-0 w-full bg-white border-t border-gray-200 p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-30 flex items-center gap-4">
         <div className="flex-1">
-          <p className="text-xs text-gray-500">Total Price</p>
-          <p className="text-lg font-bold text-gray-900">₹{item.price.toLocaleString()}</p>
+          <p className="text-xs text-gray-500">Net Price</p>
+          <p className="text-lg font-bold text-gray-900">₹{finalPrice.toLocaleString()}</p>
         </div>
         <a
           href={whatsappLink}

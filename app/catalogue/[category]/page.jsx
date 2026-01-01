@@ -22,9 +22,16 @@ export default function CategoryPage() {
   const formattedCategory =
     category.charAt(0).toUpperCase() + category.slice(1);
 
+  const [livePrices, setLivePrices] = useState(null);
+
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
+
+      // Fetch Live Prices alongside items
+      const pricesRes = await fetch("/api/livePrices").then(r => r.json());
+      setLivePrices(pricesRes);
+
       const res = await api.get(
         `/jewellery?category=${category}&search=${search}&sort=${sort}&minPrice=${priceRange[0]}&maxPrice=${priceRange[1]}&minWeight=${weightRange[0]}&maxWeight=${weightRange[1]}`
       );
@@ -42,6 +49,67 @@ export default function CategoryPage() {
     }, 500);
     return () => clearTimeout(timeout);
   }, [loadData]);
+
+  const getPrice = (item) => {
+    if (!livePrices?.prices) return null;
+    let rate = 0;
+    // Simple logic: if category/name says silver, use silver rate, else gold.
+    if (item.category === 'silver' || item.name.toLowerCase().includes('silver')) {
+      rate = livePrices.prices.silver / 1000; // per gram
+    } else {
+      rate = livePrices.prices.gold / 10; // per gram
+    }
+
+    const weight = item.weight || 0;
+    const making = item.makingCharges || 0;
+    const gst = item.gst !== undefined ? item.gst : 3;
+    const base = rate * weight;
+
+    // SCENARIO 4: Making=0, GST=0
+    if (making === 0 && gst === 0) {
+      return {
+        final: Math.round(base),
+        original: Math.round(base),
+        discount: 0,
+        suffix: "+ Making Charges + GST",
+        isFaint: true
+      };
+    }
+
+    // SCENARIO 3: Making>0, GST=0
+    if (making > 0 && gst === 0) {
+      const gross = base + making;
+      return {
+        final: Math.round(gross),
+        original: Math.round(gross),
+        discount: item.discount || 0,
+        suffix: "+ GST",
+        isFaint: true
+      };
+    }
+
+    // SCENARIO 2: Making=0, GST>0
+    if (making === 0 && gst > 0) {
+      // GST on base only, as making is unknown/excluded from this calc
+      const tax = base * (gst / 100);
+      const final = base + tax;
+      return {
+        final: Math.round(final),
+        original: Math.round(final),
+        discount: 0,
+        suffix: "+ Making Charges",
+        isFaint: true
+      };
+    }
+
+    // SCENARIO 1: Making>0, GST>0 (Full Price)
+    const gross = base + making;
+    const tax = gross * (gst / 100);
+    const original = Math.round(gross + tax);
+    const final = Math.max(0, original - (item.discount || 0));
+
+    return { original, final, discount: item.discount || 0, suffix: "", isFaint: false };
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 pt-24 pb-12">
@@ -163,44 +231,69 @@ export default function CategoryPage() {
         ) : (
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
             <AnimatePresence>
-              {items.map((item) => (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  whileHover={{ y: -5 }}
-                  className="group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden cursor-pointer flex flex-col"
-                  onClick={() => router.push(`/catalogue/item/${item.id}`)}
-                >
-                  <div className="relative h-40 md:h-64 overflow-hidden bg-gray-50 flex-shrink-0">
-                    <img
-                      src={item.image || "/placeholder.png"}
-                      alt={item.name}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
-                  </div>
+              {items.map((item) => {
+                const priceData = getPrice(item);
+                return (
+                  <motion.div
+                    key={item.id}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    whileHover={{ y: -5 }}
+                    className="group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden cursor-pointer flex flex-col"
+                    onClick={() => router.push(`/catalogue/item/${item.id}`)}
+                  >
+                    <div className="relative h-40 md:h-64 overflow-hidden bg-gray-50 flex-shrink-0">
+                      <img
+                        src={item.image || "/placeholder.png"}
+                        alt={item.name}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                      {priceData?.discount > 0 && priceData?.suffix === "" && (
+                        <div className="absolute top-2 right-2 bg-red-500 text-white text-[10px] md:text-xs font-bold px-2 py-1 rounded-full shadow-sm">
+                          OFFER
+                        </div>
+                      )}
+                    </div>
 
-                  <div className="p-3 md:p-5 flex flex-col flex-1">
-                    <p className="text-[10px] md:text-xs text-yellow-600 font-medium uppercase tracking-wider mb-1">
-                      {item.category}
-                    </p>
-                    <h3 className="font-playfair font-semibold text-sm md:text-lg text-gray-900 line-clamp-2 md:line-clamp-1 group-hover:text-yellow-700 transition-colors mb-auto">
-                      {item.name}
-                    </h3>
-
-                    <div className="flex items-center justify-between mt-3">
-                      <p className="text-base md:text-xl font-bold text-gray-900">
-                        ₹{item.price.toLocaleString()}
+                    <div className="p-3 md:p-5 flex flex-col flex-1">
+                      <p className="text-[10px] md:text-xs text-yellow-600 font-medium uppercase tracking-wider mb-1">
+                        {item.category}
                       </p>
-                      <div className="hidden md:block p-2 bg-yellow-50 rounded-full text-yellow-600 opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all">
-                        <ArrowRight size={18} />
+                      <h3 className="font-playfair font-semibold text-sm md:text-lg text-gray-900 line-clamp-2 md:line-clamp-1 group-hover:text-yellow-700 transition-colors mb-auto">
+                        {item.name}
+                      </h3>
+
+                      <div className="mt-3">
+                        {priceData ? (
+                          priceData.suffix !== "" ? (
+                            <div className="flex flex-col">
+                              <p className="text-base md:text-xl font-bold text-gray-900">
+                                ₹{priceData.final.toLocaleString()}
+                              </p>
+                              <p className="text-[10px] md:text-xs text-gray-500 font-medium">
+                                {priceData.suffix}
+                              </p>
+                            </div>
+                          ) : priceData.discount > 0 ? (
+                            <div className="flex flex-col">
+                              <span className="text-xs md:text-sm text-gray-400 line-through">₹{priceData.original.toLocaleString()}</span>
+                              <span className="text-base md:text-xl font-bold text-gray-900">₹{priceData.final.toLocaleString()}</span>
+                            </div>
+                          ) : (
+                            <p className="text-base md:text-xl font-bold text-gray-900">
+                              ₹{priceData.final.toLocaleString()}
+                            </p>
+                          )
+                        ) : (
+                          <p className="text-sm text-gray-400">Loading price...</p>
+                        )}
                       </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                );
+              })}
             </AnimatePresence>
           </div>
         )}

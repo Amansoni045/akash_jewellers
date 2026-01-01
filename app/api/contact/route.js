@@ -42,17 +42,6 @@ export async function POST(req) {
         message: `New inquiry from ${name}\n\n${message}`,
       });
     }
-    await sendResendEmail({
-      to: email,
-      subject: "Thank You — We Received Your Message",
-      html: `
-        <p>Hello ${name},</p>
-        <p>Thank you for contacting <strong>Akash Jewellers</strong>. We received your message and will respond soon.</p>
-        <hr/>
-        <p><strong>Your message:</strong></p>
-        <pre>${message}</pre>
-      `,
-    });
 
     return NextResponse.json(
       { message: "Message received successfully", data: entry },

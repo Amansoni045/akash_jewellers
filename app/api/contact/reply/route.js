@@ -30,30 +30,7 @@ export async function POST(req) {
             );
         }
 
-        const emailResult = await sendResendEmail({
-            to: email,
-            subject: subject,
-            html: `
-        <p>Dear ${name || "Customer"},</p>
-        <p>${message.replace(/\n/g, "<br/>")}</p>
-        <br/>
-        <p>Best Regards,</p>
-        <p><strong>Akash Jewellers Team</strong></p>
-      `,
-        });
-
-        if (!emailResult.success) {
-            const isTestingError = emailResult.error?.includes("testing emails") ||
-                emailResult.error?.includes("validation_error");
-
-            if (!isTestingError) {
-                return NextResponse.json(
-                    { error: "Failed to send email: " + (emailResult.error || "Unknown error") },
-                    { status: 500 }
-                );
-            }
-            console.warn("Resend Testing Mode: Email blocked but marking as replied.");
-        }
+        // REMOVED EMAIL SENDING LOGIC - Handled via mailto: in frontend
 
         await prisma.contact.update({
             where: { id },
@@ -63,13 +40,6 @@ export async function POST(req) {
                 repliedAt: new Date(),
             },
         });
-
-        if (!emailResult.success) {
-            return NextResponse.json({
-                success: true,
-                warning: "Message marked as replied, but email was blocked by Resend Free Tier (Testing Mode)."
-            });
-        }
 
         return NextResponse.json({ success: true });
     } catch (err) {

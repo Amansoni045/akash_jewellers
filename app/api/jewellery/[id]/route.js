@@ -32,9 +32,9 @@ export async function PUT(req, { params }) {
 
     const body = await req.json();
 
-    const price = parseFloat(body.price);
-    if (isNaN(price)) {
-      return NextResponse.json({ error: "Invalid price" }, { status: 400 });
+    const weight = parseFloat(body.weight);
+    if (isNaN(weight)) {
+      return NextResponse.json({ error: "Weight is mandatory" }, { status: 400 });
     }
 
     const updatedItem = await prisma.jewellery.update({
@@ -42,8 +42,12 @@ export async function PUT(req, { params }) {
       data: {
         name: body.name,
         category: (body.category || "").toLowerCase(),
-        price: price,
-        weight: body.weight ? parseFloat(body.weight) : null,
+        price: body.price ? parseFloat(body.price) : 0,
+        weight: weight,
+        makingCharges: body.makingCharges ? parseFloat(body.makingCharges) : 0,
+        gst: body.gst ? parseFloat(body.gst) : 3.0,
+        discount: body.discount ? parseFloat(body.discount) : 0,
+        description: body.description || null,
         image: body.image,
       },
     });

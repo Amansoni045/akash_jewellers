@@ -17,15 +17,19 @@ model User {
 }
 
 model Jewellery {
-  id        String   @id @default(uuid())
-  name      String
-  category  String
-  price     Float
-  weight    Float?
-  image     String?
-  images    String[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(uuid())
+  name          String
+  category      String
+  price         Float?   // Optional/Cached
+  weight        Float    // Mandatory
+  makingCharges Float    @default(0)
+  gst           Float    @default(3.0)
+  discount      Float    @default(0)
+  description   String?
+  image         String?
+  images        String[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Contact {

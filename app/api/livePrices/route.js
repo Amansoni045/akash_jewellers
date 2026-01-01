@@ -2,41 +2,12 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
 
+import { getLivePricesData } from "@/lib/data";
+
 export async function GET() {
   try {
-    const rows = await prisma.livePrice.findMany({
-      orderBy: { updatedAt: "desc" },
-      take: 2,
-    });
-
-    if (!rows || rows.length === 0) {
-      return NextResponse.json(null);
-    }
-
-    const current = rows[0];
-    const previous = rows[1];
-
-    const calc = (curr, prev) => {
-      if (prev == null) return null;
-      return {
-        delta: curr - prev,
-        percent: ((curr - prev) / prev) * 100,
-      };
-    };
-
-    return NextResponse.json({
-      prices: {
-        gold: current.gold,
-        goldRTGS: current.goldRTGS,
-        silver: current.silver,
-      },
-      diffs: {
-        gold: calc(current.gold, previous?.gold),
-        goldRTGS: calc(current.goldRTGS, previous?.goldRTGS),
-        silver: calc(current.silver, previous?.silver),
-      },
-      updatedAt: current.updatedAt,
-    });
+    const data = await getLivePricesData();
+    return NextResponse.json(data);
   } catch (err) {
     console.error("LivePrices GET Error:", err);
     return NextResponse.json(

@@ -24,11 +24,15 @@ export const metadata = {
   },
 };
 
-export default function RootLayout({ children }) {
+import { getLivePricesData } from "@/lib/data";
+
+export default async function RootLayout({ children }) {
+  const initialPrices = await getLivePricesData();
+
   return (
     <html lang="en" className="bg-white" suppressHydrationWarning>
       <body className="min-h-screen w-full overflow-x-hidden bg-white text-black">
-        <Navbar />
+        <Navbar initialPrices={JSON.parse(JSON.stringify(initialPrices))} />
         <main className="w-full min-h-screen bg-white text-black">
           {children}
         </main>

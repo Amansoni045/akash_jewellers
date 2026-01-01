@@ -8,7 +8,7 @@ import LivePrices from "./LivePrices";
 import { usePathname, useRouter } from "next/navigation";
 import { getToken } from "@/lib/getToken";
 
-export default function Navbar() {
+export default function Navbar({ initialPrices }) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -108,7 +108,7 @@ export default function Navbar() {
           <div className="flex items-center gap-2 md:gap-3">
 
             <div className="scale-90 md:scale-100 origin-right">
-              <LivePrices />
+              <LivePrices initialData={initialPrices} />
             </div>
 
             <nav className="hidden md:flex items-center space-x-6 lg:space-x-8 ml-6">

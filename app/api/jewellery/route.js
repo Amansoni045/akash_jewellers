@@ -26,16 +26,15 @@ export async function GET(req) {
     const minWeight = Number(searchParams.get("minWeight")) || 0;
     const maxWeight = Number(searchParams.get("maxWeight")) || 1000;
 
+    const id = searchParams.get("id");
+
     const where = {
       AND: [
         {
           price: { gte: minPrice, lte: maxPrice },
         },
         {
-          OR: [
-            { weight: { equals: null } },
-            { weight: { gte: minWeight, lte: maxWeight } }
-          ]
+          weight: { gte: minWeight, lte: maxWeight }
         },
         search
           ? {
@@ -47,6 +46,7 @@ export async function GET(req) {
           : {},
 
         category ? { category: category.toLowerCase() } : {},
+        id ? { id: id } : {},
       ],
     };
 
@@ -59,6 +59,7 @@ export async function GET(req) {
 
     return NextResponse.json({ data }, { status: 200 });
   } catch (err) {
+    console.error("[GET ERROR]", err);
     return NextResponse.json({ error: "Server Error" }, { status: 500 });
   }
 }
@@ -84,11 +85,12 @@ export async function POST(req) {
 
     const body = await req.json();
 
-    const price = parseFloat(body.price);
+    // Price is now optional or 0, validation focused on Weight
+    const weight = parseFloat(body.weight);
 
-    if (isNaN(price)) {
+    if (isNaN(weight)) {
       return NextResponse.json(
-        { error: "Invalid price" },
+        { error: "Weight is mandatory" },
         { status: 400 }
       );
     }
@@ -97,8 +99,12 @@ export async function POST(req) {
       data: {
         name: body.name,
         category: (body.category || "").toLowerCase(),
-        price: price,
-        weight: body.weight ? parseFloat(body.weight) : null,
+        price: body.price ? parseFloat(body.price) : 0,
+        weight: weight,
+        makingCharges: body.makingCharges ? parseFloat(body.makingCharges) : 0,
+        gst: body.gst ? parseFloat(body.gst) : 3.0,
+        discount: body.discount ? parseFloat(body.discount) : 0,
+        description: body.description || null,
         image: body.image,
       },
     });
@@ -108,6 +114,7 @@ export async function POST(req) {
       { status: 201 }
     );
   } catch (err) {
+    console.error("[POST ERROR]", err);
     return NextResponse.json(
       { error: err.message || "Server Error" },
       { status: 500 }

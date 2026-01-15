@@ -55,10 +55,6 @@ export default function LivePrices({ initialData }) {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    // Only fetch if we don't have initial data, OR if we want to poll for updates.
-    // Here we'll just fetch to ensure client-side freshness if desired, 
-    // but we check if data is already there to avoid flicker if it matches.
-
     fetch("/api/livePrices")
       .then((r) => r.json())
       .then((res) => {

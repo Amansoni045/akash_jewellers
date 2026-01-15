@@ -85,7 +85,6 @@ export async function POST(req) {
 
     const body = await req.json();
 
-    // Price is now optional or 0, validation focused on Weight
     const weight = parseFloat(body.weight);
 
     if (isNaN(weight)) {

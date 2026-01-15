@@ -30,8 +30,6 @@ export async function POST(req) {
             );
         }
 
-        // REMOVED EMAIL SENDING LOGIC - Handled via mailto: in frontend
-
         await prisma.contact.update({
             where: { id },
             data: {

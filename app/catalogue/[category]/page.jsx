@@ -28,7 +28,6 @@ export default function CategoryPage() {
     try {
       setLoading(true);
 
-      // Fetch Live Prices alongside items
       const pricesRes = await fetch("/api/livePrices").then(r => r.json());
       setLivePrices(pricesRes);
 
@@ -53,7 +52,6 @@ export default function CategoryPage() {
   const getPrice = (item) => {
     if (!livePrices?.prices) return null;
     let rate = 0;
-    // Simple logic: if category/name says silver, use silver rate, else gold.
     if (item.category === 'silver' || item.name.toLowerCase().includes('silver')) {
       rate = livePrices.prices.silver / 1000; // per gram
     } else {
@@ -65,7 +63,6 @@ export default function CategoryPage() {
     const gst = item.gst !== undefined ? item.gst : 3;
     const base = rate * weight;
 
-    // SCENARIO 4: Making=0, GST=0
     if (making === 0 && gst === 0) {
       return {
         final: Math.round(base),
@@ -76,7 +73,6 @@ export default function CategoryPage() {
       };
     }
 
-    // SCENARIO 3: Making>0, GST=0
     if (making > 0 && gst === 0) {
       const gross = base + making;
       return {
@@ -88,9 +84,7 @@ export default function CategoryPage() {
       };
     }
 
-    // SCENARIO 2: Making=0, GST>0
     if (making === 0 && gst > 0) {
-      // GST on base only, as making is unknown/excluded from this calc
       const tax = base * (gst / 100);
       const final = base + tax;
       return {
@@ -102,7 +96,6 @@ export default function CategoryPage() {
       };
     }
 
-    // SCENARIO 1: Making>0, GST>0 (Full Price)
     const gross = base + making;
     const tax = gross * (gst / 100);
     const original = Math.round(gross + tax);

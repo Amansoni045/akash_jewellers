@@ -17,10 +17,8 @@ export default function ProductDetails() {
   const [livePrices, setLivePrices] = useState(null);
 
   useEffect(() => {
-    // Fetch Live Prices alongside item data
     const fetchPrices = fetch("/api/livePrices").then(r => r.json());
 
-    // Fetch Item
     const fetchItem = api.get(`/jewellery?id=${id}`);
 
     Promise.all([fetchPrices, fetchItem]).then(([pricesData, itemRes]) => {
@@ -31,7 +29,6 @@ export default function ProductDetails() {
         setItem(currentItem);
         setSelectedImage(currentItem.image || "/placeholder.png");
 
-        // Fetch Similar
         api.get(`/jewellery?category=${currentItem.category}&limit=4`)
           .then(res => setSimilarItems(res.data.data.filter(i => i.id !== currentItem.id).slice(0, 3)));
       }
@@ -57,10 +54,6 @@ export default function ProductDetails() {
     </div>
   );
 
-  // Dynamic Price Calculation
-  // Formula: (Rate * Weight) + Making + GST
-  // Final = Original - Discount
-
   let rate = 0;
   if (item.name.toLowerCase().includes("silver")) {
     rate = livePrices?.prices?.silver || 0;
@@ -85,20 +78,15 @@ export default function ProductDetails() {
 
   let gross = 0, originalPrice = 0, finalPrice = 0, discount = 0;
   let suffix = "";
-  // Scenarios:
-  // 1. Making>0, GST>0: Full
-  // 2. Making=0, GST>0: +Making
-  // 3. Making>0, GST=0: +GST
-  // 4. Making=0, GST=0: +Making+GST
 
   if (makingCharges === 0 && gst === 0) {
-    // Scenario 4
+
     suffix = "+ Making Charges + GST";
     originalPrice = Math.round(basePrice);
     finalPrice = Math.round(basePrice);
     discount = 0;
   } else if (makingCharges === 0 && gst > 0) {
-    // Scenario 2
+
     suffix = "+ Making Charges";
     const tax = basePrice * (gst / 100);
     const total = basePrice + tax;
@@ -106,7 +94,7 @@ export default function ProductDetails() {
     finalPrice = Math.round(total);
     discount = 0;
   } else if (makingCharges > 0 && gst === 0) {
-    // Scenario 3
+
     suffix = "+ GST";
     const total = basePrice + makingCharges;
     originalPrice = Math.round(total);
@@ -114,7 +102,7 @@ export default function ProductDetails() {
     discount = item.discount || 0;
     finalPrice = Math.max(0, finalPrice - discount);
   } else {
-    // Scenario 1: Full
+
     suffix = "";
     gross = basePrice + makingCharges;
     const gstAmount = gross * (gst / 100);

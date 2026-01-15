@@ -1,13 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-    Gem,
-    MessageSquare,
-    IndianRupee,
-    TrendingUp,
-    ArrowRight,
-} from "lucide-react";
+import { Gem, MessageSquare, IndianRupee, TrendingUp, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { getToken } from "@/lib/getToken";
 
@@ -44,7 +38,6 @@ export default function AdminDashboard() {
         <div className="max-w-7xl space-y-12">
             <h1 className="text-3xl font-semibold">Dashboard</h1>
 
-            {/* KPIs */}
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <Stat icon={IndianRupee} label="Gold (10g)" value={`₹ ${data.gold?.toLocaleString("en-IN")}`} />
                 <Stat icon={IndianRupee} label="Silver (1kg)" value={`₹ ${data.silver?.toLocaleString("en-IN")}`} />
@@ -52,7 +45,6 @@ export default function AdminDashboard() {
                 <Stat icon={MessageSquare} label="Messages" value={data.messageCount} />
             </div>
 
-            {/* STATUS */}
             <div className="bg-white border rounded-2xl p-6 flex items-start gap-4">
                 <TrendingUp className="text-yellow-600 mt-1" />
                 <div>
@@ -66,7 +58,6 @@ export default function AdminDashboard() {
                 </div>
             </div>
 
-            {/* LOWER GRID */}
             <div className="grid lg:grid-cols-3 gap-8">
                 <div className="bg-white border rounded-2xl p-6">
                     <h2 className="font-semibold mb-4">Quick Actions</h2>

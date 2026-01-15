@@ -23,7 +23,7 @@ export async function GET(req) {
   ] = await Promise.all([
     prisma.jewellery.count(),
     prisma.contact.count(),
-    prisma.livePrice.findFirst(),
+    prisma.livePrice.findFirst({ orderBy: { updatedAt: "desc" } }),
     prisma.contact.findFirst({ orderBy: { createdAt: "desc" } }),
     prisma.jewellery.findFirst({ orderBy: { createdAt: "desc" } }),
   ]);

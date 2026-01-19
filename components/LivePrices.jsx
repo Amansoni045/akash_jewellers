@@ -13,9 +13,13 @@ function formatPercent(p) {
   return `${p > 0 ? "+" : ""}${p.toFixed(2)}%`;
 }
 
-function Indicator({ delta, percent }) {
+function Indicator({ delta, percent, isAfterLongGap }) {
   if (delta == null) {
     return <span className="text-xs text-gray-500">—</span>;
+  }
+
+  if (isAfterLongGap) {
+    return <span className="text-xs text-gray-500"></span>;
   }
 
   if (delta > 0) {
@@ -75,9 +79,9 @@ export default function LivePrices({ initialData }) {
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
-  if (!data?.prices) return null;
+  if (!data) return null;
 
-  const { prices, diffs, updatedAt } = data;
+  const { prices, diffs, updatedAt, isAfterLongGap, isStale } = data;
 
   const date = new Date(updatedAt).toLocaleDateString("en-IN", {
     day: "2-digit",
@@ -116,9 +120,13 @@ export default function LivePrices({ initialData }) {
             </div>
             <div className="text-right space-y-1">
               <p className="font-bold text-lg text-gray-900">
-                ₹{prices.silver?.toLocaleString("en-IN") ?? "—"}
+                {isStale ? (
+                  <span className="text-gray-400">Unavailable</span>
+                ) : (
+                  `₹${prices.silver?.toLocaleString("en-IN") ?? "—"}`
+                )}
               </p>
-              <Indicator {...(diffs?.silver ?? { delta: 0, percent: 0 })} />
+              {!isStale && <Indicator {...(diffs?.silver ?? { delta: 0, percent: 0 })} isAfterLongGap={isAfterLongGap} />}
             </div>
           </div>
 
@@ -131,9 +139,13 @@ export default function LivePrices({ initialData }) {
             </div>
             <div className="text-right space-y-1">
               <p className="font-bold text-lg text-gray-900">
-                ₹{prices.gold?.toLocaleString("en-IN") ?? "—"}
+                {isStale ? (
+                  <span className="text-gray-400">Unavailable</span>
+                ) : (
+                  `₹${prices.gold?.toLocaleString("en-IN") ?? "—"}`
+                )}
               </p>
-              <Indicator {...(diffs?.gold ?? { delta: 0, percent: 0 })} />
+              {!isStale && <Indicator {...(diffs?.gold ?? { delta: 0, percent: 0 })} isAfterLongGap={isAfterLongGap} />}
             </div>
           </div>
 
@@ -146,9 +158,13 @@ export default function LivePrices({ initialData }) {
             </div>
             <div className="text-right space-y-1">
               <p className="font-bold text-lg text-gray-900">
-                ₹{prices.goldRTGS?.toLocaleString("en-IN") ?? "—"}
+                {isStale ? (
+                  <span className="text-gray-400">Unavailable</span>
+                ) : (
+                  `₹${prices.goldRTGS?.toLocaleString("en-IN") ?? "—"}`
+                )}
               </p>
-              <Indicator {...(diffs?.goldRTGS ?? { delta: 0, percent: 0 })} />
+              {!isStale && <Indicator {...(diffs?.goldRTGS ?? { delta: 0, percent: 0 })} isAfterLongGap={isAfterLongGap} />}
             </div>
           </div>
 

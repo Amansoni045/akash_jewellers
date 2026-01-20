@@ -9,6 +9,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { getToken } from "@/lib/getToken";
 import { Sparkles } from "lucide-react";
 
+
 export default function Navbar({ initialPrices }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -85,11 +86,10 @@ export default function Navbar({ initialPrices }) {
 
   return (
     <header
-      className={`fixed top-0 w-full z-40 transition-all duration-300 ${
-        isScrolled
-          ? "bg-white/95 backdrop-blur-md shadow-sm"
-          : "bg-transparent"
-      }`}
+      className={`fixed top-0 w-full z-40 transition-all duration-300 ${isScrolled
+        ? "bg-white/95 backdrop-blur-md shadow-sm"
+        : "bg-transparent"
+        }`}
     >
       <div className="container mx-auto px-4 py-3 md:py-4">
         <div className="flex items-center justify-between gap-2 md:gap-4">
@@ -110,8 +110,20 @@ export default function Navbar({ initialPrices }) {
             </div>
 
             <nav className="hidden md:flex items-center space-x-6 lg:space-x-8 ml-6">
+
               <button onClick={() => goToSection("home")} className="nav-btn">
                 Home
+              </button>
+
+              <button
+                onClick={() => goToSection("tryon")}
+                className="nav-btn relative flex items-center gap-1.5 pr-8"
+              >
+                <Sparkles size={14} className="text-yellow-600" />
+                Try-On
+                <span className="absolute -top-1 -right-1 text-[8px] px-1.5 py-0.5 bg-gradient-to-r from-yellow-400 to-yellow-500 text-white rounded-full font-bold shadow-sm">
+                  NEW
+                </span>
               </button>
 
               <button onClick={() => goToSection("about")} className="nav-btn">
@@ -123,13 +135,6 @@ export default function Navbar({ initialPrices }) {
                 className="nav-btn"
               >
                 Catalogue
-              </button>
-              <button
-                onClick={() => document.getElementById("tryon")?.scrollIntoView({ behavior: "smooth" })}
-                className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold shadow-md hover:shadow-lg transition-all"
-              >
-                <Sparkles size={16} />
-                Try On
               </button>
 
               <button onClick={() => goToSection("contact")} className="nav-btn">
@@ -181,7 +186,7 @@ export default function Navbar({ initialPrices }) {
               )}
             </nav>
 
-            {/* Mobile Menu Toggle */}
+
             <button
               className="md:hidden p-2 text-gray-800 hover:bg-gray-100 rounded-full"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -191,7 +196,6 @@ export default function Navbar({ initialPrices }) {
           </div>
         </div>
 
-        {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <div className="md:hidden absolute top-full left-0 w-full bg-white border-t shadow-xl">
             <nav className="flex flex-col p-4 space-y-2">
@@ -200,6 +204,17 @@ export default function Navbar({ initialPrices }) {
                 className="mobile-nav-btn"
               >
                 Home
+              </button>
+
+              <button
+                onClick={() => goToSection("tryon")}
+                className="mobile-nav-btn flex items-center gap-2 border-l-4 border-yellow-500"
+              >
+                <Sparkles size={16} className="text-yellow-600" />
+                Try-On
+                <span className="ml-auto text-[10px] px-2 py-0.5 bg-yellow-500 text-white rounded-full font-bold">
+                  NEW
+                </span>
               </button>
 
               <button
@@ -214,13 +229,6 @@ export default function Navbar({ initialPrices }) {
                 className="mobile-nav-btn"
               >
                 Catalogue
-              </button>
-
-              <button
-                onClick={() => goToSection("tryon")}
-                className="mobile-nav-btn"
-              >
-                Try-On (Coming Soon)
               </button>
 
               <button

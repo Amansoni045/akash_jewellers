@@ -5,6 +5,8 @@ import { useParams, useRouter } from "next/navigation";
 import api from "@/lib/axios";
 import { MessageCircle, ShoppingBag, ArrowLeft, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
+import ProductTryOn from "@/components/TryOn/ProductTryOn";
+
 
 export default function ProductDetails() {
   const { id } = useParams();
@@ -200,6 +202,9 @@ Link: ${typeof window !== "undefined" ? window.location.href : ""}
               {suffix === "" && <p className="text-xs text-gray-400 mt-1">*Price includes GST and Making Charges</p>}
             </div>
 
+            <ProductTryOn />
+
+
             <div className="space-y-4 mb-8 text-gray-600 text-sm md:text-base">
               <p>Explore the elegance of this handcrafted piece. Perfect for occasions that matter.</p>
 
@@ -267,7 +272,6 @@ Link: ${typeof window !== "undefined" ? window.location.href : ""}
                     <img src={sim.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                   </div>
                   <h4 className="font-semibold text-sm md:text-base text-gray-900 group-hover:text-yellow-600 line-clamp-1">{sim.name}</h4>
-                  {/* Note: Dynamic pricing for grid items would require similar logic component or prop passing. For now, showing stored price or N/A or refactoring card */}
                   <p className="text-yellow-600 font-bold text-sm md:text-base">View Price</p>
                 </div>
               ))}
@@ -277,7 +281,6 @@ Link: ${typeof window !== "undefined" ? window.location.href : ""}
 
       </div>
 
-      {/* Sticky Mobile Footer */}
       <div className="fixed md:hidden bottom-0 left-0 w-full bg-white border-t border-gray-200 p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-30 flex items-center gap-4">
         <div className="flex-1">
           <p className="text-xs text-gray-500">Net Price</p>

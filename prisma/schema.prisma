@@ -20,8 +20,8 @@ model Jewellery {
   id            String   @id @default(uuid())
   name          String
   category      String
-  price         Float?   // Optional/Cached
-  weight        Float    // Mandatory
+  price         Float?
+  weight        Float
   makingCharges Float    @default(0)
   gst           Float    @default(3.0)
   discount      Float    @default(0)

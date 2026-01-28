@@ -53,9 +53,9 @@ export default function CategoryPage() {
     if (!livePrices?.prices) return null;
     let rate = 0;
     if (item.category === 'silver' || item.name.toLowerCase().includes('silver')) {
-      rate = livePrices.prices.silver / 1000; // per gram
+      rate = livePrices.prices.silver / 1000;
     } else {
-      rate = livePrices.prices.gold / 10; // per gram
+      rate = livePrices.prices.gold / 10;
     }
 
     const weight = item.weight || 0;

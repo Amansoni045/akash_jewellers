@@ -54,7 +54,7 @@ No login is required for customers.
 * Database: PostgreSQL
 * ORM: Prisma
 * Authentication: JWT (stored in localStorage)
-* Email: Resend
+* Email: Nodemailer (SMTP)
 * WhatsApp: Twilio
 * Hosting: Vercel
 
@@ -229,8 +229,13 @@ npm install
 DATABASE_URL=
 JWT_SECRET=
 
-RESEND_API_KEY=
-EMAIL_FROM=
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your-email@gmail.com
+SMTP_PASS=your-app-specific-password
+EMAIL_FROM=your-email@gmail.com
+EMAIL_FROM_NAME=Akash Jewellers
 ADMIN_EMAIL=
 
 TWILIO_ACCOUNT_SID=

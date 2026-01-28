@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
-import { sendResendEmail } from "@/lib/sendEmail";
+import { sendEmail, createCustomerReplyEmail } from "@/lib/sendEmail";
 
 export async function PATCH(req, { params }) {
   try {
@@ -42,18 +42,10 @@ export async function PATCH(req, { params }) {
     const contact = await prisma.contact.findUnique({ where: { id } });
 
     if (contact?.email) {
-      await sendResendEmail({
+      await sendEmail({
         to: contact.email,
-        subject: "Re: Your Inquiry to Akash Jewellers",
-        html: `
-          <p>Hello ${contact.name},</p>
-          <p>Thank you for reaching out. Here is our response:</p>
-          <blockquote style="border-left:4px solid #ccc;padding-left:10px;">
-            ${replyText}
-          </blockquote>
-          <br />
-          <p>Regards,<br/>Akash Jewellers</p>
-        `
+        subject: "Re: Your Inquiry - Akash Jewellers",
+        html: createCustomerReplyEmail(contact.name, replyText),
       });
     }
 

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { verifyToken } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { sendResendEmail } from "@/lib/sendEmail";
+import { sendEmail } from "@/lib/sendEmail";
 
 export async function POST(req) {
     try {

@@ -42,7 +42,7 @@ export default function JewelleryPage() {
         gst: Number(form.gst),
         discount: Number(form.discount),
         description: form.description,
-        price: 0, // Ignored or legacy
+        price: 0,
       };
 
       if (editId) {

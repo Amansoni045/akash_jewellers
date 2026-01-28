@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
-import { sendResendEmail } from "@/lib/sendEmail";
+import { sendEmail, createAdminNotificationEmail, createCustomerConfirmationEmail } from "@/lib/sendEmail";
 import { sendWhatsApp } from "@/lib/sendWhatsapp";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
@@ -23,24 +23,27 @@ export async function POST(req) {
       data: { name, email, phone, message },
     });
 
-    await sendResendEmail({
+    await sendEmail({
       to: ADMIN_EMAIL,
-      subject: `📩 New Message From ${name}`,
-      html: `
-        <h2>New Inquiry</h2>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Phone:</strong> ${phone || "Not provided"}</p>
-        <p><strong>Message:</strong></p>
-        <pre>${message}</pre>
-      `,
+      subject: `New Customer Inquiry from ${name}`,
+      html: createAdminNotificationEmail(name, email, phone, message),
+    });
+
+    await sendEmail({
+      to: email,
+      subject: "Thank you for contacting Akash Jewellers",
+      html: createCustomerConfirmationEmail(name),
     });
 
     if (ADMIN_WHATSAPP) {
-      await sendWhatsApp({
+      const whatsappResult = await sendWhatsApp({
         to: ADMIN_WHATSAPP,
         message: `New inquiry from ${name}\n\n${message}`,
       });
+
+      if (!whatsappResult.success) {
+        console.error("WhatsApp notification failed:", whatsappResult.error);
+      }
     }
 
     return NextResponse.json(

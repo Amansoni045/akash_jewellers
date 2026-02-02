@@ -50,7 +50,10 @@ export default function CategoryPage() {
   }, [loadData]);
 
   const getPrice = (item) => {
-    if (!livePrices?.prices) return null;
+    if (!livePrices?.prices || !livePrices.prices.gold || !livePrices.prices.silver) {
+      return null;
+    }
+
     let rate = 0;
     if (item.category === 'silver' || item.name.toLowerCase().includes('silver')) {
       rate = livePrices.prices.silver / 1000;
@@ -280,7 +283,10 @@ export default function CategoryPage() {
                             </p>
                           )
                         ) : (
-                          <p className="text-sm text-gray-400">Loading price...</p>
+                          <div className="flex flex-col">
+                            <p className="text-sm md:text-base font-semibold text-yellow-600">Price on Request</p>
+                            <p className="text-[10px] md:text-xs text-gray-500">Contact us for pricing</p>
+                          </div>
                         )}
                       </div>
                     </div>

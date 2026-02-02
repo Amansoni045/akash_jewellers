@@ -56,17 +56,10 @@ export default function ProductDetails() {
     </div>
   );
 
-  let rate = 0;
-  if (item.name.toLowerCase().includes("silver")) {
-    rate = livePrices?.prices?.silver || 0;
-  } else {
-    rate = livePrices?.prices?.gold || 0;
-  }
-
-  if (item.category === 'silver') rate = livePrices?.prices?.silver || 0;
+  const livePricesAvailable = livePrices?.prices?.gold && livePrices?.prices?.silver;
 
   let ratePerGram = 0;
-  if (livePrices?.prices) {
+  if (livePricesAvailable) {
     if (item.category === 'silver' || item.name.toLowerCase().includes('silver')) {
       ratePerGram = livePrices.prices.silver / 1000;
     } else {
@@ -117,7 +110,7 @@ export default function ProductDetails() {
   const whatsappMessage = `Hi, I am interested in this product:
 Name: ${item.name}
 ID: ${item.id}
-Price: ₹${finalPrice.toLocaleString()} ${suffix}
+Price: ${!livePricesAvailable ? "Price on Request - Please provide current pricing" : `₹${finalPrice.toLocaleString()} ${suffix}`}
 Link: ${typeof window !== "undefined" ? window.location.href : ""}
 `;
 
@@ -176,7 +169,16 @@ Link: ${typeof window !== "undefined" ? window.location.href : ""}
             </div>
 
             <div className="mb-6 md:mb-8">
-              {suffix !== "" ? (
+              {!livePricesAvailable ? (
+                <div className="flex flex-col">
+                  <p className="text-3xl md:text-4xl font-bold text-yellow-600">
+                    Price on Request
+                  </p>
+                  <p className="text-sm text-gray-500 font-medium mt-1">
+                    Contact us for current pricing
+                  </p>
+                </div>
+              ) : suffix !== "" ? (
                 <div className="flex flex-col">
                   <p className="text-3xl md:text-4xl font-bold text-yellow-600">
                     ₹ {finalPrice.toLocaleString()}
@@ -199,7 +201,7 @@ Link: ${typeof window !== "undefined" ? window.location.href : ""}
                   ₹ {finalPrice.toLocaleString()}
                 </p>
               )}
-              {suffix === "" && <p className="text-xs text-gray-400 mt-1">*Price includes GST and Making Charges</p>}
+              {livePricesAvailable && suffix === "" && <p className="text-xs text-gray-400 mt-1">*Price includes GST and Making Charges</p>}
             </div>
 
             <ProductTryOn />
@@ -284,7 +286,9 @@ Link: ${typeof window !== "undefined" ? window.location.href : ""}
       <div className="fixed md:hidden bottom-0 left-0 w-full bg-white border-t border-gray-200 p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-30 flex items-center gap-4">
         <div className="flex-1">
           <p className="text-xs text-gray-500">Net Price</p>
-          <p className="text-lg font-bold text-gray-900">₹{finalPrice.toLocaleString()}</p>
+          <p className="text-lg font-bold text-gray-900">
+            {!livePricesAvailable ? "Price on Request" : `₹${finalPrice.toLocaleString()}`}
+          </p>
         </div>
         <a
           href={whatsappLink}

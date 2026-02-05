@@ -147,8 +147,19 @@ export default function Navbar({ initialPrices }) {
                 </Link>
               )}
 
-              <Link href="/wishlist" className="p-2 text-gray-700 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors relative group" title="Wishlist">
-                <Heart size={20} className="group-hover:fill-red-500 transition-colors" />
+              <Link
+                href="/wishlist"
+                className={`p-2 rounded-full transition-colors relative group ${pathname === "/wishlist"
+                  ? "text-red-500 bg-red-50"
+                  : "text-gray-700 hover:text-red-500 hover:bg-red-50"
+                  }`}
+                title="Wishlist"
+              >
+                <Heart
+                  size={20}
+                  className={`transition-colors ${pathname === "/wishlist" ? "fill-red-500" : "group-hover:fill-red-500"
+                    }`}
+                />
               </Link>
 
               {!isLoggedIn ? (

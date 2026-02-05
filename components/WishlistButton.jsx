@@ -1,8 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Heart, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+
+import { getToken } from "@/lib/getToken";
 
 export default function WishlistButton({ jewelleryId, initialIsWishlisted = false, onToggle }) {
     const [isWishlisted, setIsWishlisted] = useState(initialIsWishlisted);
@@ -17,7 +20,7 @@ export default function WishlistButton({ jewelleryId, initialIsWishlisted = fals
         e.preventDefault();
         e.stopPropagation();
 
-        const token = localStorage.getItem("token");
+        const token = getToken();
         if (!token) {
             setShowLoginModal(true);
             return;
@@ -68,8 +71,8 @@ export default function WishlistButton({ jewelleryId, initialIsWishlisted = fals
             </motion.button>
 
             <AnimatePresence>
-                {showLoginModal && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center isolate">
+                {showLoginModal && typeof document !== "undefined" && createPortal(
+                    <div className="fixed inset-0 z-[9999] flex items-center justify-center isolate">
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -82,7 +85,7 @@ export default function WishlistButton({ jewelleryId, initialIsWishlisted = fals
                             animate={{ scale: 1, opacity: 1, y: 0 }}
                             exit={{ scale: 0.9, opacity: 0, y: 20 }}
                             onClick={(e) => e.stopPropagation()}
-                            className="bg-white rounded-2xl shadow-2xl p-6 w-[90%] max-w-sm relative z-50 overflow-hidden"
+                            className="bg-white rounded-2xl shadow-2xl p-6 w-[90%] max-w-sm relative z-[10000] overflow-hidden"
                         >
                             <button
                                 onClick={(e) => { e.stopPropagation(); setShowLoginModal(false); }}
@@ -116,7 +119,8 @@ export default function WishlistButton({ jewelleryId, initialIsWishlisted = fals
                                 </div>
                             </div>
                         </motion.div>
-                    </div>
+                    </div>,
+                    document.body
                 )}
             </AnimatePresence>
         </>

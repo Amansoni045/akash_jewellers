@@ -1,7 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import Link from "next/link";
 import WishlistButton from "@/components/WishlistButton";
 import { Loader2, Heart, ArrowRight, ShoppingBag } from "lucide-react";
@@ -87,18 +85,15 @@ export default function WishlistPage() {
     if (loading) {
         return (
             <div className="min-h-screen flex flex-col">
-                <Navbar />
                 <div className="flex-grow flex items-center justify-center">
                     <Loader2 className="w-10 h-10 animate-spin text-gold-500" />
                 </div>
-                <Footer />
             </div>
         );
     }
 
     return (
         <div className="min-h-screen flex flex-col bg-stone-50">
-            <Navbar />
             <main className="flex-grow container mx-auto px-4 py-8 mt-20">
 
                 <header className="mb-12 text-center">
@@ -213,7 +208,6 @@ export default function WishlistPage() {
                     </div>
                 )}
             </main>
-            <Footer />
         </div>
     );
 }

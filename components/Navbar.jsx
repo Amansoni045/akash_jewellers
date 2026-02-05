@@ -109,7 +109,7 @@ export default function Navbar({ initialPrices }) {
               <LivePrices initialData={initialPrices} />
             </div>
 
-            <nav className="hidden md:flex items-center space-x-6 lg:space-x-8 ml-6">
+            <nav className="hidden lg:flex items-center space-x-6 lg:space-x-8 ml-6">
 
               <button onClick={() => goToSection("home")} className="nav-btn">
                 Home
@@ -199,7 +199,7 @@ export default function Navbar({ initialPrices }) {
 
 
             <button
-              className="md:hidden p-2 text-gray-800 hover:bg-gray-100 rounded-full"
+              className="lg:hidden p-2 text-gray-800 hover:bg-gray-100 rounded-full"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               {isMobileMenuOpen ? <X size={26} /> : <Menu size={26} />}
@@ -208,7 +208,7 @@ export default function Navbar({ initialPrices }) {
         </div>
 
         {isMobileMenuOpen && (
-          <div className="md:hidden absolute top-full left-0 w-full bg-white border-t shadow-xl">
+          <div className="lg:hidden absolute top-full left-0 w-full bg-white border-t shadow-xl">
             <nav className="flex flex-col p-4 space-y-2">
               <button
                 onClick={() => goToSection("home")}
@@ -248,6 +248,33 @@ export default function Navbar({ initialPrices }) {
               >
                 Contact
               </button>
+
+              {user?.role === "admin" && (
+                <Link href="/admin" className="mobile-nav-btn text-blue-600">
+                  Admin Panel
+                </Link>
+              )}
+
+              <Link href="/wishlist" className="mobile-nav-btn flex items-center gap-2">
+                Wishlist
+              </Link>
+
+
+              {!isLoggedIn ? (
+                <Link
+                  href="/login"
+                  className="mobile-nav-btn text-yellow-600"
+                >
+                  Login
+                </Link>
+              ) : (
+                <button
+                  onClick={logout}
+                  className="mobile-nav-btn text-red-600 text-left"
+                >
+                  Logout ({user?.name?.split(" ")[0]})
+                </button>
+              )}
             </nav>
           </div>
         )}

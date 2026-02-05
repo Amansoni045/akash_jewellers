@@ -7,6 +7,7 @@ import { MessageCircle, ShoppingBag, ArrowLeft, ArrowRight } from "lucide-react"
 import { motion } from "framer-motion";
 import ProductTryOn from "@/components/TryOn/ProductTryOn";
 import WishlistButton from "@/components/WishlistButton";
+import PriceTransparencyTimeline from "@/components/PriceTransparencyTimeline";
 
 
 export default function ProductDetails() {
@@ -214,6 +215,18 @@ Link: ${typeof window !== "undefined" ? window.location.href : ""}
                 </p>
               )}
               {livePricesAvailable && suffix === "" && <p className="text-xs text-gray-400 mt-1">*Price includes GST and Making Charges</p>}
+
+              {livePricesAvailable && (
+                <PriceTransparencyTimeline
+                  metalType={item.category === 'silver' || item.name.toLowerCase().includes('silver') ? "silver" : "gold"}
+                  ratePerGram={ratePerGram}
+                  weight={item.weight}
+                  makingCharges={makingCharges}
+                  gstPercentage={gst}
+                  discount={discount}
+                  finalPrice={finalPrice}
+                />
+              )}
             </div>
 
             <ProductTryOn />

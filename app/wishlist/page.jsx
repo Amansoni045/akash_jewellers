@@ -4,6 +4,7 @@ import Link from "next/link";
 import WishlistButton from "@/components/WishlistButton";
 import { Loader2, Heart, ArrowRight, ShoppingBag } from "lucide-react";
 import { motion } from "framer-motion";
+import { getToken } from "@/lib/getToken";
 
 export default function WishlistPage() {
     const [wishlist, setWishlist] = useState([]);
@@ -14,7 +15,8 @@ export default function WishlistPage() {
 
     useEffect(() => {
         const fetchData = async () => {
-            const token = localStorage.getItem("token");
+            const token = getToken();
+
             if (!token) {
                 setLoading(false);
                 setIsLoggedIn(false);
@@ -28,6 +30,12 @@ export default function WishlistPage() {
                     fetch("/api/livePrices")
                 ]);
 
+                if (wishlistRes.status === 401) {
+                    setIsLoggedIn(false);
+                    setLoading(false);
+                    return;
+                }
+
                 if (!wishlistRes.ok) throw new Error("Failed to fetch wishlist");
 
                 const wishlistData = await wishlistRes.json();
@@ -37,6 +45,7 @@ export default function WishlistPage() {
                 setLivePrices(pricesData);
 
             } catch (err) {
+                console.error(err);
                 setError(err.message);
             } finally {
                 setLoading(false);

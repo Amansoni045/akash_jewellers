@@ -6,6 +6,8 @@ import { useParams, useRouter } from "next/navigation";
 import { ArrowRight, Filter, Search, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
+import WishlistButton from "@/components/WishlistButton";
+
 export default function CategoryPage() {
   const router = useRouter();
   const { category } = useParams();
@@ -18,9 +20,10 @@ export default function CategoryPage() {
   const [priceRange, setPriceRange] = useState([0, 500000]);
   const [weightRange, setWeightRange] = useState([0, 100]);
   const [showFilters, setShowFilters] = useState(false);
+  const [wishlistIds, setWishlistIds] = useState(new Set());
 
   const formattedCategory =
-    category.charAt(0).toUpperCase() + category.slice(1);
+    category.toLowerCase() === "all" ? "Our Entire" : category.charAt(0).toUpperCase() + category.slice(1);
 
   const [livePrices, setLivePrices] = useState(null);
 
@@ -35,6 +38,21 @@ export default function CategoryPage() {
         `/jewellery?category=${category}&search=${search}&sort=${sort}&minPrice=${priceRange[0]}&maxPrice=${priceRange[1]}&minWeight=${weightRange[0]}&maxWeight=${weightRange[1]}`
       );
       setItems(res.data.data);
+
+      const token = typeof window !== 'undefined' ? localStorage.getItem("token") : null;
+      if (token) {
+        try {
+          const wRes = await fetch("/api/wishlist", { headers: { Authorization: `Bearer ${token}` } });
+          if (wRes.ok) {
+            const wData = await wRes.json();
+            const ids = new Set(wData.wishlist.map(w => w.jewelleryId));
+            setWishlistIds(ids);
+          }
+        } catch (e) {
+          console.error("Failed to fetch wishlist", e);
+        }
+      }
+
       setLoading(false);
     } catch (err) {
       console.error(err);
@@ -246,8 +264,16 @@ export default function CategoryPage() {
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+
+                      <div className="absolute top-3 right-3 z-10 p-1 bg-white/80 backdrop-blur-sm rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                        <WishlistButton
+                          jewelleryId={item.id}
+                          initialIsWishlisted={wishlistIds.has(item.id)}
+                        />
+                      </div>
+
                       {priceData?.discount > 0 && priceData?.suffix === "" && (
-                        <div className="absolute top-2 right-2 bg-red-500 text-white text-[10px] md:text-xs font-bold px-2 py-1 rounded-full shadow-sm">
+                        <div className="absolute top-2 left-2 bg-red-500 text-white text-[10px] md:text-xs font-bold px-2 py-1 rounded-full shadow-sm">
                           OFFER
                         </div>
                       )}

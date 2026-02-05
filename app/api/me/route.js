@@ -14,22 +14,21 @@ export async function GET(req) {
     }
 
     const token = authHeader.split(" ")[1];
+    console.log("Verifying token:", token.substring(0, 10) + "...");
     const decoded = verifyToken(token);
 
     if (!decoded) {
-      return NextResponse.json(
-        { error: "Invalid token" },
-        { status: 403 }
-      );
+      console.error("Token verification result: null");
+      return NextResponse.json({ error: "Invalid token" }, { status: 403 });
     }
 
     const user = await prisma.user.findUnique({
       where: { id: decoded.id },
-      select: { 
-        id: true, 
-        name: true, 
+      select: {
+        id: true,
+        name: true,
         email: true,
-        role: true        
+        role: true
       },
     });
 

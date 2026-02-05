@@ -6,6 +6,7 @@ import api from "@/lib/axios";
 import { MessageCircle, ShoppingBag, ArrowLeft, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import ProductTryOn from "@/components/TryOn/ProductTryOn";
+import WishlistButton from "@/components/WishlistButton";
 
 
 export default function ProductDetails() {
@@ -18,18 +19,27 @@ export default function ProductDetails() {
   const [selectedImage, setSelectedImage] = useState("");
   const [livePrices, setLivePrices] = useState(null);
 
+  const [isWishlisted, setIsWishlisted] = useState(false);
+
   useEffect(() => {
     const fetchPrices = fetch("/api/livePrices").then(r => r.json());
-
     const fetchItem = api.get(`/jewellery?id=${id}`);
 
-    Promise.all([fetchPrices, fetchItem]).then(([pricesData, itemRes]) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem("token") : null;
+    const fetchWishlist = token
+      ? fetch("/api/wishlist", { headers: { Authorization: `Bearer ${token}` } }).then(r => r.ok ? r.json() : { wishlist: [] })
+      : Promise.resolve({ wishlist: [] });
+
+    Promise.all([fetchPrices, fetchItem, fetchWishlist]).then(([pricesData, itemRes, wishlistData]) => {
       setLivePrices(pricesData);
 
       const currentItem = itemRes.data.data?.[0];
       if (currentItem) {
         setItem(currentItem);
         setSelectedImage(currentItem.image || "/placeholder.png");
+
+        const isInWishlist = wishlistData.wishlist?.some(w => w.jewelleryId === currentItem.id);
+        setIsWishlisted(isInWishlist);
 
         api.get(`/jewellery?category=${currentItem.category}&limit=4`)
           .then(res => setSimilarItems(res.data.data.filter(i => i.id !== currentItem.id).slice(0, 3)));
@@ -163,11 +173,13 @@ Link: ${typeof window !== "undefined" ? window.location.href : ""}
             <h1 className="text-2xl md:text-4xl font-playfair font-bold text-gray-900 mb-2">
               {item.name}
             </h1>
-            <div className="flex items-center gap-3 mb-6">
-              <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs md:text-sm font-medium">In Stock</span>
-              <span className="text-gray-500 text-xs md:text-sm">ID: {item.id.slice(0, 8)}</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs md:text-sm font-medium">In Stock</span>
+                <span className="text-gray-500 text-xs md:text-sm">ID: {item.id.slice(0, 8)}</span>
+              </div>
+              <WishlistButton jewelleryId={item.id} initialIsWishlisted={isWishlisted} />
             </div>
-
             <div className="mb-6 md:mb-8">
               {!livePricesAvailable ? (
                 <div className="flex flex-col">

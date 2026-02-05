@@ -45,7 +45,7 @@ export async function GET(req) {
           }
           : {},
 
-        category ? { category: category.toLowerCase() } : {},
+        (category && category.toLowerCase() !== "all") ? { category: category.toLowerCase() } : {},
         id ? { id: id } : {},
       ],
     };

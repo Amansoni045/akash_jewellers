@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X, User } from "lucide-react";
+import { Menu, X, User, Heart } from "lucide-react";
 import LivePrices from "./LivePrices";
 import { usePathname, useRouter } from "next/navigation";
 import { getToken } from "@/lib/getToken";
@@ -147,6 +147,10 @@ export default function Navbar({ initialPrices }) {
                 </Link>
               )}
 
+              <Link href="/wishlist" className="p-2 text-gray-700 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors relative group" title="Wishlist">
+                <Heart size={20} className="group-hover:fill-red-500 transition-colors" />
+              </Link>
+
               {!isLoggedIn ? (
                 <Link
                   href="/login"
@@ -174,6 +178,13 @@ export default function Navbar({ initialPrices }) {
                           {user?.email}
                         </span>
                       </div>
+                      <Link
+                        href="/wishlist"
+                        onClick={() => setProfileMenuOpen(false)}
+                        className="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded"
+                      >
+                        My Wishlist
+                      </Link>
                       <button
                         onClick={logout}
                         className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded"

@@ -1,17 +1,19 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { loginSchema } from "@/lib/validators/auth";
+import { handleZodError } from "@/lib/validators/utils";
 import { comparePassword, generateToken } from "@/lib/auth";
 
 export async function POST(req) {
   try {
-    const { email, password } = await req.json();
+    const body = await req.json();
+    const validation = loginSchema.safeParse(body);
 
-    if (!email || !password) {
-      return NextResponse.json(
-        { error: "All fields required" },
-        { status: 400 }
-      );
+    if (!validation.success) {
+      return handleZodError(validation.error);
     }
+
+    const { email, password } = validation.data;
 
     const user = await prisma.user.findUnique({
       where: { email: email.toLowerCase() },
@@ -46,7 +48,7 @@ export async function POST(req) {
           id: user.id,
           name: user.name,
           email: user.email,
-          role: user.role,   
+          role: user.role,
         },
       },
       { status: 200 }

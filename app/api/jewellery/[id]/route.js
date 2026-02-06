@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { jewelleryUpdateSchema } from "@/lib/validators/jewellery";
+import { handleZodError } from "@/lib/validators/utils";
 import { verifyToken } from "@/lib/auth";
 
 export async function PUT(req, { params }) {
@@ -31,24 +33,19 @@ export async function PUT(req, { params }) {
     }
 
     const body = await req.json();
+    const validation = jewelleryUpdateSchema.safeParse(body);
 
-    const weight = parseFloat(body.weight);
-    if (isNaN(weight)) {
-      return NextResponse.json({ error: "Weight is mandatory" }, { status: 400 });
+    if (!validation.success) {
+      return handleZodError(validation.error);
     }
+
+    const data = validation.data;
+    if (data.category) data.category = data.category.toLowerCase();
 
     const updatedItem = await prisma.jewellery.update({
       where: { id },
       data: {
-        name: body.name,
-        category: (body.category || "").toLowerCase(),
-        price: body.price ? parseFloat(body.price) : 0,
-        weight: weight,
-        makingCharges: body.makingCharges ? parseFloat(body.makingCharges) : 0,
-        gst: body.gst ? parseFloat(body.gst) : 3.0,
-        discount: body.discount ? parseFloat(body.discount) : 0,
-        description: body.description || null,
-        image: body.image,
+        ...data
       },
     });
 

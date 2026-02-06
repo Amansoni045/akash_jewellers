@@ -1,17 +1,22 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { hashPassword } from "@/lib/auth";
+import { registerSchema } from "@/lib/validators/auth";
+import { handleZodError } from "@/lib/validators/utils";
+import { hashPassword, generateToken } from "@/lib/auth";
 
 export async function POST(req) {
   try {
-    const { name, email, password } = await req.json();
+    const body = await req.json();
+    const validation = registerSchema.safeParse(body);
 
-    if (!name || !email || !password) {
+    if (!validation.success) {
       return NextResponse.json(
-        { error: "All fields required" },
+        { error: "Validation failed", issues: validation.error.flatten().fieldErrors },
         { status: 400 }
       );
     }
+
+    const { name, email, password } = validation.data;
 
     const existingUser = await prisma.user.findUnique({
       where: { email: email.toLowerCase() },
@@ -24,19 +29,7 @@ export async function POST(req) {
       );
     }
 
-    if (password.length < 8) {
-      return NextResponse.json(
-        { error: "Password must be at least 8 characters" },
-        { status: 400 }
-      );
-    }
-
-    if (!email.includes("@") || !email.endsWith(".com")) {
-      return NextResponse.json(
-        { error: "Invalid email" },
-        { status: 400 }
-      );
-    }
+    // Password length and email format validated by Zod
 
     const hashedPassword = await hashPassword(password);
 
@@ -48,12 +41,24 @@ export async function POST(req) {
       },
     });
 
+    const token = generateToken({
+      id: newUser.id,
+      email: newUser.email,
+      role: newUser.role,
+    });
+
     return NextResponse.json(
       {
         message: "User registered successfully",
-        user: { id: newUser.id, name: newUser.name, email: newUser.email },
+        token,
+        user: {
+          id: newUser.id,
+          name: newUser.name,
+          email: newUser.email,
+          role: newUser.role,
+        },
       },
-      { status: 200 }
+      { status: 201 }
     );
 
   } catch (err) {

@@ -19,9 +19,19 @@ export default function RegisterPage() {
     try {
       const res = await api.post("/register", form);
 
-      if (res.data?.message) {
-        setMsg("Registered successfully!");
+      if (res.data?.token) {
+        setMsg("Registered successfully! Logging in...");
 
+        // Auto-login logic matches login page
+        document.cookie = `token=${res.data.token}; path=/; max-age=604800; SameSite=Lax`;
+        localStorage.setItem("token", res.data.token);
+
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 800);
+      } else if (res.data?.message) {
+        // Fallback if no token (shouldn't happen with new backend)
+        setMsg("Registered successfully!");
         setTimeout(() => {
           router.push("/login");
         }, 800);

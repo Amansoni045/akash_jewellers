@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { verifyToken } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { wishlistSchema } from "@/lib/validators/wishlist";
+import { handleZodError } from "@/lib/validators/utils";
 
 export async function GET(req) {
     try {
@@ -42,10 +44,14 @@ export async function POST(req) {
             return NextResponse.json({ error: "Invalid token" }, { status: 403 });
         }
 
-        const { jewelleryId } = await req.json();
-        if (!jewelleryId) {
-            return NextResponse.json({ error: "Jewellery ID required" }, { status: 400 });
+        const body = await req.json();
+        const validation = wishlistSchema.safeParse(body);
+
+        if (!validation.success) {
+            return handleZodError(validation.error);
         }
+
+        const { jewelleryId } = validation.data;
 
         const existing = await prisma.wishlist.findUnique({
             where: {

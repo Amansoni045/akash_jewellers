@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { contactSchema } from "@/lib/validators/contact";
+import { handleZodError } from "@/lib/validators/utils";
 import { verifyToken } from "@/lib/auth";
 import { sendEmail, createAdminNotificationEmail, createCustomerConfirmationEmail } from "@/lib/sendEmail";
 import { sendWhatsApp } from "@/lib/sendWhatsapp";
@@ -10,14 +12,16 @@ const ADMIN_WHATSAPP = process.env.ADMIN_WHATSAPP_NUMBER;
 export async function POST(req) {
   try {
     const body = await req.json();
-    const { name, email, phone, message } = body;
+    const validation = contactSchema.safeParse(body);
 
-    if (!name || !email || !message) {
+    if (!validation.success) {
       return NextResponse.json(
-        { error: "Name, email and message are required" },
+        { error: "Validation failed", issues: validation.error.flatten().fieldErrors },
         { status: 400 }
       );
     }
+
+    const { name, email, phone, message } = validation.data;
 
     const entry = await prisma.contact.create({
       data: { name, email, phone, message },

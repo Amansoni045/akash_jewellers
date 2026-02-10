@@ -64,7 +64,7 @@ export default function WishlistPage() {
 
         let ratePerGram = 0;
         if (product.category === 'silver' || product.name.toLowerCase().includes('silver')) {
-            ratePerGram = livePrices.prices.silver / 1000;
+            ratePerGram = livePrices.prices.silver / 10;
         } else {
             ratePerGram = livePrices.prices.gold / 10;
         }

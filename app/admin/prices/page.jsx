@@ -91,7 +91,7 @@ export default function AdminPricesPage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-600 mb-1">
-              Silver Price (1kg)
+              Silver Price (10 gms)
             </label>
             <input
               value={prices.silver}

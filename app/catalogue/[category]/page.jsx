@@ -74,7 +74,7 @@ export default function CategoryPage() {
 
     let rate = 0;
     if (item.category === 'silver' || item.name.toLowerCase().includes('silver')) {
-      rate = livePrices.prices.silver / 1000;
+      rate = livePrices.prices.silver / 10;
     } else {
       rate = livePrices.prices.gold / 10;
     }

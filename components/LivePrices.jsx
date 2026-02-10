@@ -115,7 +115,7 @@ export default function LivePrices({ initialData }) {
 
           <div className="grid grid-cols-[1fr_auto] gap-4 items-center">
             <div>
-              <p className="font-bold text-gray-800 text-base">Silver (1 kg)</p>
+              <p className="font-bold text-gray-800 text-base">Silver (10 gms)</p>
               <span className="text-xs text-gray-500 font-medium">Market rate</span>
             </div>
             <div className="text-right space-y-1">

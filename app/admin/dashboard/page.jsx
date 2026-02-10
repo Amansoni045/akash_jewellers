@@ -40,7 +40,7 @@ export default function AdminDashboard() {
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <Stat icon={IndianRupee} label="Gold (10g)" value={`₹ ${data.gold?.toLocaleString("en-IN")}`} />
-                <Stat icon={IndianRupee} label="Silver (1kg)" value={`₹ ${data.silver?.toLocaleString("en-IN")}`} />
+                <Stat icon={IndianRupee} label="Silver (10 gms)" value={`₹ ${data.silver?.toLocaleString("en-IN")}`} />
                 <Stat icon={Gem} label="Jewellery Items" value={data.jewelleryCount} />
                 <Stat icon={MessageSquare} label="Messages" value={data.messageCount} />
             </div>

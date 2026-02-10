@@ -72,7 +72,7 @@ export default function ProductDetails() {
   let ratePerGram = 0;
   if (livePricesAvailable) {
     if (item.category === 'silver' || item.name.toLowerCase().includes('silver')) {
-      ratePerGram = livePrices.prices.silver / 1000;
+      ratePerGram = livePrices.prices.silver / 10;
     } else {
       ratePerGram = livePrices.prices.gold / 10;
     }

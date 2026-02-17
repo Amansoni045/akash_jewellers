@@ -265,7 +265,7 @@ export default function CategoryPage() {
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
 
-                      <div className="absolute top-3 right-3 z-10 p-1 bg-white/80 backdrop-blur-sm rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="absolute top-3 right-3 z-10 p-1 bg-white/80 backdrop-blur-sm rounded-full opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                         <WishlistButton
                           jewelleryId={item.id}
                           initialIsWishlisted={wishlistIds.has(item.id)}

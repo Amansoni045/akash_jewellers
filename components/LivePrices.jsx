@@ -58,15 +58,30 @@ export default function LivePrices({ initialData }) {
   const [data, setData] = useState(initialData);
   const [isOpen, setIsOpen] = useState(false);
 
-  useEffect(() => {
+  const [loading, setLoading] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(Date.now());
+
+  const fetchPrices = () => {
+    setLoading(true);
     fetch("/api/livePrices")
       .then((r) => r.json())
       .then((res) => {
         if (res) {
           setData(res);
+          setLastUpdated(Date.now());
         }
       })
-      .catch((err) => console.error("Failed to fetch live prices:", err));
+      .catch((err) => console.error("Failed to fetch live prices:", err))
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    // Initial fetch if no data
+    if (!data) fetchPrices();
+
+    // Poll every 60 seconds
+    const interval = setInterval(fetchPrices, 60000);
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -98,10 +113,13 @@ export default function LivePrices({ initialData }) {
   return (
     <div className="relative z-50 live-prices-container">
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          setIsOpen(!isOpen);
+          if (!isOpen) fetchPrices();
+        }}
         className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-yellow-600 to-yellow-500 text-white rounded-full shadow-md hover:from-yellow-500 hover:to-yellow-600 transition-all"
       >
-        <TrendingUp className="w-4 h-4" />
+        <TrendingUp className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
         <span className="font-medium">Live Rates</span>
       </button>
 

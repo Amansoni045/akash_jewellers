@@ -58,6 +58,7 @@ export default function Navbar({ initialPrices }) {
 
   const logout = () => {
     localStorage.removeItem("token");
+    document.cookie = "token=; path=/; max-age=0; SameSite=Lax";
     setUser(null);
     setIsLoggedIn(false);
     router.push("/login");

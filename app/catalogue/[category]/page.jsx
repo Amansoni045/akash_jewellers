@@ -7,10 +7,12 @@ import { ArrowRight, Filter, Search, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import WishlistButton from "@/components/WishlistButton";
+import { normalizeCategory } from "@/lib/category";
 
 export default function CategoryPage() {
   const router = useRouter();
   const { category } = useParams();
+  const normalizedCategory = normalizeCategory(category);
 
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,7 +25,9 @@ export default function CategoryPage() {
   const [wishlistIds, setWishlistIds] = useState(new Set());
 
   const formattedCategory =
-    category.toLowerCase() === "all" ? "Our Entire" : category.charAt(0).toUpperCase() + category.slice(1);
+    normalizedCategory === "all"
+      ? "Our Entire"
+      : normalizedCategory.charAt(0).toUpperCase() + normalizedCategory.slice(1);
 
   const [livePrices, setLivePrices] = useState(null);
 
@@ -35,7 +39,7 @@ export default function CategoryPage() {
       setLivePrices(pricesRes);
 
       const res = await api.get(
-        `/jewellery?category=${category}&search=${search}&sort=${sort}&minPrice=${priceRange[0]}&maxPrice=${priceRange[1]}&minWeight=${weightRange[0]}&maxWeight=${weightRange[1]}`
+        `/jewellery?category=${normalizedCategory}&search=${search}&sort=${sort}&minPrice=${priceRange[0]}&maxPrice=${priceRange[1]}&minWeight=${weightRange[0]}&maxWeight=${weightRange[1]}`
       );
       setItems(res.data.data);
 
@@ -58,7 +62,7 @@ export default function CategoryPage() {
       console.error(err);
       setLoading(false);
     }
-  }, [category, search, sort, priceRange, weightRange]);
+  }, [normalizedCategory, search, sort, priceRange, weightRange]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -134,7 +138,7 @@ export default function CategoryPage() {
             {formattedCategory} Collection
           </h1>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Discover our exclusive range of {category}, handcrafted with precision and passion.
+            Discover our exclusive range of {normalizedCategory}, handcrafted with precision and passion.
           </p>
         </div>
 
@@ -152,7 +156,7 @@ export default function CategoryPage() {
               <div className="relative flex-1 md:w-80">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                 <input
-                  placeholder={`Search ${category}...`}
+                  placeholder={`Search ${normalizedCategory}...`}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500 outline-none"
@@ -257,7 +261,7 @@ export default function CategoryPage() {
                     className="group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden cursor-pointer flex flex-col"
                     onClick={() => router.push(`/catalogue/item/${item.id}`)}
                   >
-                    <div className="relative h-40 md:h-64 overflow-hidden bg-gray-50 flex-shrink-0">
+                    <div className="relative h-40 md:h-64 overflow-hidden bg-gray-50 shrink-0">
                       <img
                         src={item.image || "/placeholder.png"}
                         alt={item.name}

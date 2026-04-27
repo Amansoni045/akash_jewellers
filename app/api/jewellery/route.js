@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { jewellerySchema } from "@/lib/validators/jewellery";
 import { handleZodError } from "@/lib/validators/utils";
 import { verifyToken } from "@/lib/auth";
+import { getCategoryAliases, normalizeCategory } from "@/lib/category";
 
 export async function GET(req) {
   try {
@@ -13,6 +14,8 @@ export async function GET(req) {
     const search = searchParams.get("search") || "";
     const sort = searchParams.get("sort") || "createdAt_desc";
     const category = searchParams.get("category") || "";
+    const normalizedCategory = normalizeCategory(category);
+    const categoryAliases = getCategoryAliases(normalizedCategory);
 
     const orderFields = {
       createdAt_desc: { createdAt: "desc" },
@@ -47,7 +50,13 @@ export async function GET(req) {
           }
           : {},
 
-        (category && category.toLowerCase() !== "all") ? { category: category.toLowerCase() } : {},
+        (normalizedCategory && normalizedCategory !== "all")
+          ? {
+            category: {
+              in: categoryAliases,
+            },
+          }
+          : {},
         id ? { id: id } : {},
       ],
     };
@@ -93,11 +102,12 @@ export async function POST(req) {
     }
 
     const { name, category, price, weight, makingCharges, gst, discount, description, image } = validation.data;
+    const normalizedCategory = normalizeCategory(category);
 
     const newItem = await prisma.jewellery.create({
       data: {
         name,
-        category: category.toLowerCase(),
+        category: normalizedCategory,
         price,
         weight,
         makingCharges,

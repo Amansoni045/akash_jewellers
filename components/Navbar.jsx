@@ -6,7 +6,7 @@ import Image from "next/image";
 import { Menu, X, User, Heart } from "lucide-react";
 import LivePrices from "./LivePrices";
 import { usePathname, useRouter } from "next/navigation";
-import { getToken } from "@/lib/getToken";
+import { clearAuthToken, getToken } from "@/lib/getToken";
 import { Sparkles } from "lucide-react";
 
 
@@ -30,20 +30,41 @@ export default function Navbar({ initialPrices }) {
     const token = getToken();
     if (!token) return;
 
-    fetch("/api/me", {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("/api/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (res.status === 401 || res.status === 403) {
+          clearAuthToken();
+          setUser(null);
+          setIsLoggedIn(false);
+          return;
+        }
+
+        if (!res.ok) {
+          setUser(null);
+          setIsLoggedIn(false);
+          return;
+        }
+
+        const data = await res.json();
         if (data?.user) {
           setUser(data.user);
           setIsLoggedIn(true);
+          return;
         }
-      })
-      .catch(() => {
+
         setUser(null);
         setIsLoggedIn(false);
-      });
+      } catch {
+        setUser(null);
+        setIsLoggedIn(false);
+      }
+    };
+
+    fetchUser();
   }, []);
 
   useEffect(() => {
@@ -57,8 +78,7 @@ export default function Navbar({ initialPrices }) {
   }, []);
 
   const logout = () => {
-    localStorage.removeItem("token");
-    document.cookie = "token=; path=/; max-age=0; SameSite=Lax";
+    clearAuthToken();
     setUser(null);
     setIsLoggedIn(false);
     router.push("/login");
@@ -94,7 +114,7 @@ export default function Navbar({ initialPrices }) {
     >
       <div className="container mx-auto px-4 py-3 md:py-4">
         <div className="flex items-center justify-between gap-2 md:gap-4">
-          <Link href="/" className="flex-shrink-0">
+          <Link href="/" className="shrink-0">
             <Image
               src="/logo1.png"
               alt="Akash Jewellers"
@@ -122,7 +142,7 @@ export default function Navbar({ initialPrices }) {
               >
                 <Sparkles size={14} className="text-yellow-600" />
                 Try-On
-                <span className="absolute -top-1 -right-1 text-[8px] px-1.5 py-0.5 bg-gradient-to-r from-yellow-400 to-yellow-500 text-white rounded-full font-bold shadow-sm">
+                <span className="absolute -top-1 -right-1 text-[8px] px-1.5 py-0.5 bg-linear-to-r from-yellow-400 to-yellow-500 text-white rounded-full font-bold shadow-sm">
                   NEW
                 </span>
               </button>

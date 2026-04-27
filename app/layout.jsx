@@ -3,7 +3,10 @@ import Navbar from "@/components/Navbar.jsx";
 import Footer from "@/components/Footer.jsx";
 import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
 export const metadata = {
+  metadataBase: new URL(siteUrl),
   title: "Akash Jewellers",
   description: "Discover exquisite 22K/24K gold jewellery, diamond rings, and traditional designs at Akash Jewellers, Pali. Trusted since 2002.",
   keywords: ["Akash Jewellers", "Gold Jewellery Pali", "Diamond Rings", "Jewellery Shop Korba", "Handcrafted Jewellery"],

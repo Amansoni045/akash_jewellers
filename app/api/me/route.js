@@ -14,11 +14,9 @@ export async function GET(req) {
     }
 
     const token = authHeader.split(" ")[1];
-    console.log("Verifying token:", token.substring(0, 10) + "...");
     const decoded = verifyToken(token);
 
     if (!decoded) {
-      console.error("Token verification result: null");
       return NextResponse.json({ error: "Invalid token" }, { status: 403 });
     }
 

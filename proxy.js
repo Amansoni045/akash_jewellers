@@ -3,7 +3,7 @@ import { jwtVerify } from "jose";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-export async function middleware(req) {
+export async function proxy(req) {
   const { pathname } = req.nextUrl;
 
   if (!pathname.startsWith("/admin")) {
@@ -28,7 +28,7 @@ export async function middleware(req) {
 
     return NextResponse.next();
   } catch (err) {
-    console.error("Middleware Auth Error:", err);
+    console.error("Proxy Auth Error:", err);
     return NextResponse.redirect(new URL("/login", req.url));
   }
 }

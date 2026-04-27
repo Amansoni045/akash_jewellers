@@ -5,7 +5,7 @@ import { Heart, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 
-import { getToken } from "@/lib/getToken";
+import { clearAuthToken, getToken } from "@/lib/getToken";
 
 export default function WishlistButton({ jewelleryId, initialIsWishlisted = false, onToggle }) {
     const [isWishlisted, setIsWishlisted] = useState(initialIsWishlisted);
@@ -43,10 +43,9 @@ export default function WishlistButton({ jewelleryId, initialIsWishlisted = fals
                 body: JSON.stringify({ jewelleryId }),
             });
 
-            if (res.status === 401) {
+            if (res.status === 401 || res.status === 403) {
                 // Token invalid or expired - force logout state and show modal
-                localStorage.removeItem("token");
-                document.cookie = "token=; path=/; max-age=0; SameSite=Lax";
+                clearAuthToken();
                 setIsWishlisted(previousState); // Revert UI
                 setShowLoginModal(true);
                 return;
@@ -89,13 +88,13 @@ export default function WishlistButton({ jewelleryId, initialIsWishlisted = fals
             </motion.button>
 
             {showLoginModal && createPortal(
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-9999 flex items-center justify-center p-4">
                     <div
                         className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
                         onClick={(e) => { e.stopPropagation(); setShowLoginModal(false); }}
                     />
 
-                    <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm relative z-[10000] overflow-hidden transform transition-all scale-100 opacity-100">
+                    <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm relative z-10000 overflow-hidden transform transition-all scale-100 opacity-100">
                         <button
                             onClick={(e) => { e.stopPropagation(); setShowLoginModal(false); }}
                             className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-colors"

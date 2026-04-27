@@ -4,7 +4,7 @@ import Link from "next/link";
 import WishlistButton from "@/components/WishlistButton";
 import { Loader2, Heart, ArrowRight, ShoppingBag } from "lucide-react";
 import { motion } from "framer-motion";
-import { getToken } from "@/lib/getToken";
+import { clearAuthToken, getToken } from "@/lib/getToken";
 
 export default function WishlistPage() {
     const [wishlist, setWishlist] = useState([]);
@@ -30,7 +30,8 @@ export default function WishlistPage() {
                     fetch("/api/livePrices")
                 ]);
 
-                if (wishlistRes.status === 401) {
+                if (wishlistRes.status === 401 || wishlistRes.status === 403) {
+                    clearAuthToken();
                     setIsLoggedIn(false);
                     setLoading(false);
                     return;
@@ -94,7 +95,7 @@ export default function WishlistPage() {
     if (loading) {
         return (
             <div className="min-h-screen flex flex-col">
-                <div className="flex-grow flex items-center justify-center">
+                <div className="grow flex items-center justify-center">
                     <Loader2 className="w-10 h-10 animate-spin text-gold-500" />
                 </div>
             </div>
@@ -103,7 +104,7 @@ export default function WishlistPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-stone-50">
-            <main className="flex-grow container mx-auto px-4 py-8 mt-20">
+            <main className="grow container mx-auto px-4 py-8 mt-20">
 
                 <header className="mb-12 text-center">
                     <motion.h1
@@ -172,7 +173,7 @@ export default function WishlistPage() {
                                     className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group border border-stone-100"
                                 >
                                     <Link href={`/catalogue/item/${product.id}`}>
-                                        <div className="aspect-[4/5] relative overflow-hidden bg-gray-100">
+                                        <div className="aspect-4/5 relative overflow-hidden bg-gray-100">
                                             {displayImage ? (
                                                 <img
                                                     src={displayImage}
